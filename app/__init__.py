@@ -6,6 +6,9 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@db:5432/pisadaprodb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Habilitar modo de depuración
+app.config['DEBUG'] = True
+
 db.init_app(app)  # Inicializa db con la app
 
 with app.app_context():

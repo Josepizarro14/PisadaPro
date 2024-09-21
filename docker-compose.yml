@@ -3,10 +3,14 @@ version: '3.8'
 services:
   web:
     build: .
+    volumes:
+      - .:/app
+    command: python -m app.app
     ports:
       - "5000:5000"
     environment:
       DATABASE_URL: "postgresql://user:password@db/pisadaprodb"
+      FLASK_ENV: development
     depends_on:
       - db
 
