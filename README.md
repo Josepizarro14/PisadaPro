@@ -33,17 +33,18 @@ Pisadapro
 ├── Dockerfile           # Utilización de Python para descargar las librerías
 └── requirements.txt     # Librerías necesarias para el correcto funcionamiento
 
-PisadaPro/
-┣ app/
-┃ ┣ static/
-┃ ┣ templates/
-┃ ┣ __pycache__/
-┃ ┣ app.py
-┃ ┣ database.py
-┃ ┣ models.py
-┃ ┣ routes.py
-┃ ┗ __init__.py
-┣ docker-compose.yml
-┣ Dockerfile
-┣ README.md
-┗ requirements.txt
+# PisadaPro
+
+* [app/](.\PisadaPro\app)
+  * [static/](.\PisadaPro\app\static)
+  * [templates/](.\PisadaPro\app\templates)
+  * [__pycache__/](.\PisadaPro\app\__pycache__)
+  * [app.py](.\PisadaPro\app\app.py)
+  * [database.py](.\PisadaPro\app\database.py)
+  * [models.py](.\PisadaPro\app\models.py)
+  * [routes.py](.\PisadaPro\app\routes.py)
+  * [__init__.py](.\PisadaPro\app\__init__.py)
+* [docker-compose.yml](.\PisadaPro\docker-compose.yml)
+* [Dockerfile](.\PisadaPro\Dockerfile)
+* [README.md](.\PisadaPro\README.md)
+* [requirements.txt](.\PisadaPro\requirements.txt)
