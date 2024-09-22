@@ -1,5 +1,6 @@
 from flask import Flask
 from .database import db, init_db
+from .models import Cliente
 
 def create_app():
     app = Flask(__name__)
