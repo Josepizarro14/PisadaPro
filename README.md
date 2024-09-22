@@ -1,6 +1,6 @@
 # Proyecto E-commerce PisadaPro
 
-Este es un proyecto de e-commerce desarrollado utilizando **Flask**, **PostgreSQL** y **Docker**. El objetivo de este proyecto es proporcionar una plataforma para la gestión de clientes y ventas de zapatillas.
+Este es un proyecto de e-commerce desarrollado utilizando **Flask**, **PostgreSQL** y **Docker**. El objetivo de este proyecto es proporcionar una plataforma para la gestión de clientes y ventas de zapatillas. (Se busca implementar otros frameworks, también se incluirá MongoDB)
 
 ## Tecnologías utilizadas
 
