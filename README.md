@@ -23,14 +23,27 @@ El proyecto sigue la estructura recomendada por Flask para facilitar la organiza
 
 Pisadapro
 ├── app
-│   ├── /templates          # Archivos HTML
-│   ├── /static             # Archivos estáticos (CSS, JS, imágenes)
-│   ├── app.py              # Arranque de Flask
-│   ├── routes.py           # Definición de las rutas de la aplicación
-│   ├── models.py           # Definición de los modelos de la base de datos
-│   └── __init__.py         # Inicialización de la aplicación Flask
-├── docker-compose.yml      # Configuración de Docker
-├── Dockerfile              # Utilización de Python para descargar las librerías
-└── requirements.txt        # Librerías necesarias para el correcto funcionamiento
+│   ├── /templates       # Archivos HTML
+│   ├── /static          # Archivos estáticos (CSS, JS, imágenes)
+│   ├── app.py           # Arranque de Flask
+│   ├── routes.py        # Definición de las rutas de la aplicación
+│   ├── models.py        # Definición de los modelos de la base de datos
+│   └── __init__.py      # Inicialización de la aplicación Flask
+├── docker-compose.yml   # Configuración de Docker
+├── Dockerfile           # Utilización de Python para descargar las librerías
+└── requirements.txt     # Librerías necesarias para el correcto funcionamiento
 
-
+PisadaPro/
+┣ app/
+┃ ┣ static/
+┃ ┣ templates/
+┃ ┣ __pycache__/
+┃ ┣ app.py
+┃ ┣ database.py
+┃ ┣ models.py
+┃ ┣ routes.py
+┃ ┗ __init__.py
+┣ docker-compose.yml
+┣ Dockerfile
+┣ README.md
+┗ requirements.txt
