@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Panel de Administración</h2>
+    <h3>Clientes Registrados</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>RUT</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.rut_persona }}</td>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.apellido }}</td>
+                <td>{{ cliente.email }}</td>
+                <td>{{ cliente.telefono }}</td>
+                <td>
+                    <a href="{{ url_for('edit_client', email=cliente.email) }}" class="btn btn-warning">Editar</a>
+                    <form action="{{ url_for('delete_client', email=cliente.email) }}" method="post" style="display: inline-block;">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('create_client') }}" class="btn btn-primary">Crear Cliente</a>
+</div>
+{% endblock %}

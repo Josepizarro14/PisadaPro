@@ -86,3 +86,105 @@ def load_routes(app, db):
         flash('Has cerrado sesión exitosamente.', 'info')
         return redirect(url_for('home'))
 
+    # Ruta para el panel de administración
+    @app.route('/admin', methods=['GET', 'POST'])
+    def admin():
+        clientes = Cliente.query.all()  # Obtener todos los clientes
+        return render_template('admin.html', clientes=clientes)
+    
+    # Ruta para crear un nuevo cliente
+    @app.route('/create_client', methods=['GET', 'POST'])
+    def create_client():
+        if request.method == 'POST':
+            rut_persona = request.form['rut_persona']
+            nombre = request.form['nombre']
+            apellido = request.form['apellido']
+            direccion = request.form['direccion']
+            comuna = request.form['comuna']
+            region = request.form['region']
+            email = request.form['email']
+            telefono = request.form['telefono']
+            contrasena = request.form['contrasena']
+
+            # Verificar si el correo ya está registrado
+            cliente_existente = Cliente.query.filter_by(email=email).first()
+            if cliente_existente:
+                flash('Este correo ya está registrado.', 'warning')
+                return redirect(url_for('create_client'))
+
+            # Crear nuevo cliente
+            nuevo_cliente = Cliente(
+                rut_persona=rut_persona,
+                nombre=nombre,
+                apellido=apellido,
+                direccion=direccion,
+                comuna=comuna,
+                region=region,
+                email=email,
+                telefono=telefono,
+                contrasena=contrasena
+            )
+
+            try:
+                db.session.add(nuevo_cliente)
+                db.session.commit()
+                flash('Cliente creado exitosamente.', 'success')
+                return redirect(url_for('admin'))  # Redirigir al panel de administración
+            except Exception as e:
+                flash(f'Error al crear cliente: {e}', 'danger')
+                db.session.rollback()
+
+        return render_template('create_client.html')
+
+    # Ruta para editar un cliente
+    @app.route('/edit_client/<email>', methods=['GET', 'POST'])
+    def edit_client(email):
+        cliente = Cliente.query.filter_by(email=email).first()
+        
+        if not cliente:
+            flash('Cliente no encontrado.', 'danger')
+            return redirect(url_for('admin'))
+        
+        if request.method == 'POST':
+            cliente.rut_persona = request.form['rut_persona']
+            cliente.nombre = request.form['nombre']
+            cliente.apellido = request.form['apellido']
+            cliente.direccion = request.form['direccion']
+            cliente.comuna = request.form['comuna']
+            cliente.region = request.form['region']
+            cliente.email = request.form['email']
+            cliente.telefono = request.form['telefono']
+            cliente.contrasena = request.form['contrasena']
+
+            try:
+                db.session.commit()
+                flash('Cliente actualizado exitosamente.', 'success')
+                return redirect(url_for('admin'))
+            except Exception as e:
+                flash(f'Error al actualizar cliente: {e}', 'danger')
+                db.session.rollback()
+
+        return render_template('edit_client.html', cliente=cliente)
+
+    # Ruta para eliminar un cliente
+    @app.route('/delete_client/<email>', methods=['POST'])
+    def delete_client(email):
+        cliente = Cliente.query.filter_by(email=email).first()
+        
+        if cliente:
+            try:
+                db.session.delete(cliente)
+                db.session.commit()
+                flash('Cliente eliminado exitosamente.', 'success')
+            except Exception as e:
+                flash(f'Error al eliminar cliente: {e}', 'danger')
+                db.session.rollback()
+        else:
+            flash('Cliente no encontrado.', 'danger')
+        
+        return redirect(url_for('admin'))
+
+
+
+
+
