@@ -26,7 +26,6 @@ El proyecto sigue la estructura recomendada por Flask para facilitar la organiza
 * [app]
   * [static]            # Archivos estáticos (CSS, JS, imágenes)
   * [templates]         # Archivos HTML
-  * [__pycache__]
   * [app.py]            # Arranque de Flask
   * [database.py]       # Conexión a la bd
   * [models.py]         # Definición de los modelos de la base de datos
@@ -34,6 +33,5 @@ El proyecto sigue la estructura recomendada por Flask para facilitar la organiza
   * [__init__.py]       # Inicialización de la aplicación Flask
 * [docker-compose.yml]  # Configuración de Docker
 * [Dockerfile]          # Utilización de Python para descargar las librerías
-* [README.md]
 * [requirements.txt]    # Librerías necesarias para el correcto funcionamiento
 
