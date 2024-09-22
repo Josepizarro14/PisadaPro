@@ -20,13 +20,15 @@ En caso de cualquier problema, se puede modificar el docker-compose.yml
 
 ## Estructura del proyecto
 El proyecto sigue la estructura recomendada por Flask para facilitar la organización y escalabilidad del código. La estructura básica del proyecto es la siguiente:
-/app
-  /templates   # Archivos HTML
-  /static      # Archivos estáticos (CSS, JS, imágenes)
-  app.py         # Arranque de flask
-  routes.py      # Definición de las rutas de la aplicación
-  models.py      # Definición de los modelos de la base de datos
-  __init__.py    # Inicialización de la aplicación Flask
-docker-compose.yml  # Configuración de Docker
-Dockerfile       # Utilización de python para descargar las librerias
-requirements.txt # Librerias necesarias para el correcto funcionamiento
+
+Pisadapro
+├── app/
+│   ├── /templates   # Archivos HTML
+│   ├── /static      # Archivos estáticos (CSS, JS, imágenes)
+│   ├── app.py         # Arranque de flask
+│   ├── routes.py      # Definición de las rutas de la aplicación
+│   ├── models.py      # Definición de los modelos de la base de datos
+│   └── __init__.py    # Inicialización de la aplicación Flask
+├── docker-compose.yml  # Configuración de Docker
+├── Dockerfile       # Utilización de python para descargar las librerias
+└── requirements.txt # Librerias necesarias para el correcto funcionamiento
