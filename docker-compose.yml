@@ -10,7 +10,7 @@ services:
       - "5000:5000"
     environment:
       DATABASE_URL: "postgresql://user:password@db/pisadaprodb"
-      FLASK_ENV: development
+      FLASK_DEBUG: "1"
     depends_on:
       - db
 

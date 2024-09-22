@@ -1,9 +1,8 @@
 from flask import render_template, request, redirect, url_for, flash
-from app import app, db
-from app.models import Cliente  # Asegúrate de importar tu modelo Cliente
-
+from .models import Cliente  # Asegúrate de importar tu modelo Cliente
+import time
     # Ruta para la página de inicio
-def load_routes(app):  
+def load_routes(app, db):  
     @app.route('/')
     def home():
         #return '¡Hola, mundo!'
@@ -25,13 +24,15 @@ def load_routes(app):
             cliente = Cliente.query.filter_by(email=email).first()
             if cliente and cliente.contrasena == password:
                 flash('Inicio de sesión exitoso.', 'success')
+                time.sleep(2)
                 return redirect(url_for('home'))
             else:
                 flash('Correo o contraseña incorrectos.', 'danger')
         
         return render_template('login.html')
 
-    # Ruta para el registro de usuarios
+        
+        # Ruta para el registro de usuarios
     @app.route('/register', methods=['GET', 'POST'])
     def register():
         if request.method == 'POST':
@@ -49,7 +50,7 @@ def load_routes(app):
             cliente_existente = Cliente.query.filter_by(email=email).first()
             if cliente_existente:
                 flash('Este correo ya está registrado. Por favor, inicie sesión.', 'warning')
-                return redirect(url_for('login'))
+                return render_template('register.html')  # Mantener en la misma página
 
             # Crear nuevo cliente
             nuevo_cliente = Cliente(
@@ -69,12 +70,14 @@ def load_routes(app):
                 db.session.add(nuevo_cliente)
                 db.session.commit()
                 flash('Registro exitoso. Ahora puedes iniciar sesión.', 'success')
-                return redirect(url_for('login'))
+                return render_template('register.html')
             except Exception as e:
                 flash(f'Ocurrió un error al registrarte: {e}', 'danger')
                 db.session.rollback()
 
         return render_template('register.html')
+
+
 
     # Ruta para cerrar sesión (lógica por implementar)
     @app.route('/logout')
