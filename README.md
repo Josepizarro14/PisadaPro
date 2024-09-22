@@ -33,9 +33,9 @@ Pisadapro
 ├── Dockerfile           # Utilización de Python para descargar las librerías
 └── requirements.txt     # Librerías necesarias para el correcto funcionamiento
 
-# PisadaPro
+### PisadaPro
 
-* [app/](.\PisadaPro\app)
+* [app/]
   * [static/](.\PisadaPro\app\static)
   * [templates/](.\PisadaPro\app\templates)
   * [__pycache__/](.\PisadaPro\app\__pycache__)
