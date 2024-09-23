@@ -23,7 +23,7 @@ def create_app():
     # Función para cargar el usuario desde la base de datos
     @login_manager.user_loader
     def load_user(user_id):
-        return Cliente.query.get(int(user_id))
+        return Cliente.query.get(user_id)  # No se necesita convertir a int
 
     with app.app_context():
         try:

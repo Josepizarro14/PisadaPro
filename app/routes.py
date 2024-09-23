@@ -68,10 +68,12 @@ def load_routes(app, db):
 
     # Ruta para cerrar sesión (lógica por implementar)
     @app.route('/logout')
+    @login_required  # Asegúrate de que el usuario esté autenticado
     def logout():
-        # Aquí puedes manejar la lógica de cerrar sesión, por ejemplo, eliminando la sesión del usuario
+        logout_user()  # Cierra la sesión del usuario
         flash('Has cerrado sesión exitosamente.', 'info')
         return redirect(url_for('home'))
+
 
     # Ruta para el panel de administración
     @app.route('/admin', methods=['GET', 'POST'])
@@ -177,11 +179,10 @@ def load_routes(app, db):
             email = request.form['email']
             password = request.form['password']
             
-            # Aquí se realiza la lógica de autenticación
             cliente = Cliente.query.filter_by(email=email).first()
-            if cliente and cliente.contrasena == password:
+            if cliente and cliente.check_password(password):  # Cambia aquí
+                login_user(cliente)  # Inicia sesión
                 flash('Inicio de sesión exitoso.', 'success')
-                time.sleep(2)
                 return redirect(url_for('home'))
             else:
                 flash('Correo o contraseña incorrectos.', 'danger')
