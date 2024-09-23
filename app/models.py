@@ -13,7 +13,7 @@ class Cliente(db.Model, UserMixin):
     region = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), primary_key=True, unique=True, nullable=False)
     telefono = db.Column(db.String(15), nullable=False)
-    contrasena_hash = db.Column(db.String(128), nullable=False)  # Guardamos el hash de la contraseña
+    contrasena = db.Column(db.String(128), nullable=False) # Guardamos el hash de la contraseña
 
     # Constructor
     def __init__(self, rut_persona, nombre, apellido, direccion, comuna, region, email, telefono, contrasena):
@@ -29,10 +29,11 @@ class Cliente(db.Model, UserMixin):
 
     # Métodos para manejar la contraseña de forma segura
     def set_password(self, contrasena):
-        self.contrasena_hash = generate_password_hash(contrasena)
+        self.contrasena = generate_password_hash(contrasena)
 
     def check_password(self, contrasena):
-        return check_password_hash(self.contrasena_hash, contrasena)
+        return check_password_hash(self.contrasena, contrasena)
+
 
     # Método necesario por Flask-Login para identificar al usuario
     def get_id(self):

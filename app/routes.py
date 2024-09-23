@@ -17,25 +17,6 @@ def load_routes(app, db):
     @app.route('/about')
     def about():
         return render_template('about.html')
-
-    # Ruta para iniciar sesión
-    @app.route('/login', methods=['GET', 'POST'])
-    def login():
-        if request.method == 'POST':
-            email = request.form['email']
-            password = request.form['password']
-            
-            # Aquí se realiza la lógica de autenticación
-            cliente = Cliente.query.filter_by(email=email).first()
-            if cliente and cliente.contrasena == password:
-                flash('Inicio de sesión exitoso.', 'success')
-                time.sleep(2)
-                return redirect(url_for('home'))
-            else:
-                flash('Correo o contraseña incorrectos.', 'danger')
-        
-        return render_template('login.html')
-
         
         # Ruta para el registro de usuarios
     @app.route('/register', methods=['GET', 'POST'])
@@ -190,25 +171,23 @@ def load_routes(app, db):
         
         return redirect(url_for('admin'))
 
-        @app.route('/login', methods=['GET', 'POST'])
-    
+    @app.route('/login', methods=['GET', 'POST'])
     def login():
         if request.method == 'POST':
             email = request.form['email']
             password = request.form['password']
             
-            # Buscar el cliente en la base de datos
+            # Aquí se realiza la lógica de autenticación
             cliente = Cliente.query.filter_by(email=email).first()
-            
-            # Verificar si el cliente existe y si la contraseña es correcta
-            if cliente and cliente.check_password(password):
-                login_user(cliente)
+            if cliente and cliente.contrasena == password:
                 flash('Inicio de sesión exitoso.', 'success')
+                time.sleep(2)
                 return redirect(url_for('home'))
             else:
                 flash('Correo o contraseña incorrectos.', 'danger')
         
         return render_template('login.html')
+
 
 
 
