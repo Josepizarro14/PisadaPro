@@ -4,53 +4,72 @@
 <div class="container">
     <h2>Editar Cliente</h2>
     <form action="{{ url_for('edit_client', email=cliente.email) }}" method="post">
-        <div class="form-group">
-            <label for="rut_persona">RUT:</label>
-            <input type="text" class="form-control" id="rut_persona" name="rut_persona" value="{{ cliente.rut_persona }}" required>
+        <div class="row">
+            <!-- Primera columna -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="rut_persona">RUT:</label>
+                    <input type="text" class="form-control" id="rut_persona" name="rut_persona"
+                        value="{{ cliente.rut_persona }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ cliente.nombre }}"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido:</label>
+                    <input type="text" class="form-control" id="apellido" name="apellido" value="{{ cliente.apellido }}"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="direccion">Dirección:</label>
+                    <input type="text" class="form-control" id="direccion" name="direccion"
+                        value="{{ cliente.direccion }}" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="comuna">Comuna:</label>
+                    <input type="text" class="form-control" id="comuna" name="comuna" value="{{ cliente.comuna }}"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="region">Región:</label>
+                    <input type="text" class="form-control" id="region" name="region" value="{{ cliente.region }}"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo Electrónico:</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ cliente.email }}"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="text" class="form-control" id="telefono" name="telefono" value="{{ cliente.telefono }}"
+                        required>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="nombre">Nombre:</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ cliente.nombre }}" required>
-        </div>
-        <div class="form-group">
-            <label for="apellido">Apellido:</label>
-            <input type="text" class="form-control" id="apellido" name="apellido" value="{{ cliente.apellido }}" required>
-        </div>
-        <div class="form-group">
-            <label for="direccion">Dirección:</label>
-            <input type="text" class="form-control" id="direccion" name="direccion" value="{{ cliente.direccion }}" required>
-        </div>
-        <div class="form-group">
-            <label for="comuna">Comuna:</label>
-            <input type="text" class="form-control" id="comuna" name="comuna" value="{{ cliente.comuna }}" required>
-        </div>
-        <div class="form-group">
-            <label for="region">Región:</label>
-            <input type="text" class="form-control" id="region" name="region" value="{{ cliente.region }}" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Correo Electrónico:</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ cliente.email }}" required>
-        </div>
-        <div class="form-group">
-            <label for="telefono">Teléfono:</label>
-            <input type="text" class="form-control" id="telefono" name="telefono" value="{{ cliente.telefono }}" required>
-        </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
             <label for="contrasena">Contraseña:</label>
-            <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Dejar en blanco si no se desea cambiar">
+            <input type="password" class="form-control" id="contrasena" name="contrasena"
+                placeholder="Dejar en blanco si no se desea cambiar">
         </div>
-        <button type="submit" class="btn btn-primary mt-2">Actualizar Cliente</button>
-        <a href="{{ url_for('admin') }}" class="btn btn-secondary mt-2">Volver al Menú Admin</a>
+        <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-primary mt-2">Actualizar Cliente</button>
+            <a href="{{ url_for('admin') }}" class="btn btn-secondary mt-2">Volver al Menú Admin</a>
+        </div>
     </form>
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="mt-3">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 </div>
 {% endblock %}
