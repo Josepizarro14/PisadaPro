@@ -1,6 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash
 from .models import Cliente  # Asegúrate de importar tu modelo Cliente
 import time
+
+from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.security import check_password_hash
+
+
     # Ruta para la página de inicio
 def load_routes(app, db):  
     @app.route('/')
@@ -50,7 +55,7 @@ def load_routes(app, db):
             cliente_existente = Cliente.query.filter_by(email=email).first()
             if cliente_existente:
                 flash('Este correo ya está registrado. Por favor, inicie sesión.', 'warning')
-                return render_template('register.html')  # Mantener en la misma página
+                return render_template('register.html')
 
             # Crear nuevo cliente
             nuevo_cliente = Cliente(
@@ -76,6 +81,7 @@ def load_routes(app, db):
                 db.session.rollback()
 
         return render_template('register.html')
+
 
 
 
@@ -183,6 +189,27 @@ def load_routes(app, db):
             flash('Cliente no encontrado.', 'danger')
         
         return redirect(url_for('admin'))
+
+        @app.route('/login', methods=['GET', 'POST'])
+    
+    def login():
+        if request.method == 'POST':
+            email = request.form['email']
+            password = request.form['password']
+            
+            # Buscar el cliente en la base de datos
+            cliente = Cliente.query.filter_by(email=email).first()
+            
+            # Verificar si el cliente existe y si la contraseña es correcta
+            if cliente and cliente.check_password(password):
+                login_user(cliente)
+                flash('Inicio de sesión exitoso.', 'success')
+                return redirect(url_for('home'))
+            else:
+                flash('Correo o contraseña incorrectos.', 'danger')
+        
+        return render_template('login.html')
+
 
 
 
