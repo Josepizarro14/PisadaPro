@@ -38,6 +38,6 @@ El proyecto sigue la estructura recomendada por Flask para facilitar la organiza
 ## Inicio de sesión
 
 Para la creación de usuario hay 2 roles, cliente y administrador.
-Para poder entrar como administrador las credenciales son las siguientes: correo: admin@example.com y contraseña: admin123. 
+Para poder entrar como administrador, las credenciales son las siguientes: correo: admin@example.com y contraseña: admin123
 Se crea este usuario por default.
 
