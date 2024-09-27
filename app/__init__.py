@@ -29,8 +29,29 @@ def create_app():
         try:
             db.create_all()
             print("Tablas creadas exitosamente.")
+
+            # Crear el administrador solo si no existe
+            if not Cliente.query.filter_by(email='admin@example.com').first():
+                admin = Cliente(
+                    rut_persona='12345678-9',
+                    nombre='Admin',
+                    apellido='Admin',
+                    direccion='123 Calle Falsa',
+                    comuna='Santiago',
+                    region='Metropolitana',
+                    email='admin@example.com',
+                    telefono='123456789',
+                    contrasena='admin123',  # La contraseña será hasheada automáticamente
+                    rol='administrador'
+                )
+                db.session.add(admin)
+                db.session.commit()
+                print("Administrador creado exitosamente.")
+            else:
+                print("El administrador ya existe.")
+
         except Exception as e:
-            print(f"Error al crear tablas: {e}")
+            print(f"Error al crear tablas o al insertar el administrador: {e}")
 
     from .routes import load_routes
     load_routes(app, db)

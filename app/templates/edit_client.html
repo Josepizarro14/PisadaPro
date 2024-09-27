@@ -57,6 +57,14 @@
             <input type="password" class="form-control" id="contrasena" name="contrasena"
                 placeholder="Dejar en blanco si no se desea cambiar">
         </div>
+        <div class="form-group">
+            <label for="rol">Rol:</label>
+            <select class="form-control" id="rol" name="rol">
+                <option value="cliente" {% if cliente.rol == 'cliente' %}selected{% endif %}>Cliente</option>
+                <option value="administrador" {% if cliente.rol == 'administrador' %}selected{% endif %}>Administrador</option>
+            </select>
+        </div>
+        
         <div class="d-flex justify-content-center mt-4">
             <button type="submit" class="btn btn-primary mt-2">Actualizar Cliente</button>
             <a href="{{ url_for('admin') }}" class="btn btn-secondary mt-2">Volver al Menú Admin</a>
