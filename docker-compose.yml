@@ -1,8 +1,7 @@
-version: '3.8'
 
 services:
   web:
-    build: .
+    build: .  
     volumes:
       - .:/app
     command: python -m app.app
@@ -13,6 +12,7 @@ services:
       FLASK_DEBUG: "1"
     depends_on:
       - db
+      - product-service
 
   db:
     image: postgres
@@ -25,5 +25,24 @@ services:
     ports:
       - "5432:5432"
 
+  mongodb:
+    image: mongo
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+
+  product-service:
+    build: ./product-service 
+    volumes:
+      - .:/product-service:/usr/src/app
+    ports:
+      - "3000:3000"  
+    environment:
+      MONGO_URL: "mongodb://mongodb:27017/productdb"
+    depends_on:
+      - mongodb
+
 volumes:
   postgres_data:
+  mongo_data:
