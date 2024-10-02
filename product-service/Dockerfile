@@ -1,20 +1,20 @@
-# Utiliza la imagen base de Node.js
+# Usa la imagen base de Node
 FROM node:18
 
-# Crea y establece el directorio de trabajo
+# Establece el directorio de trabajo
 WORKDIR /usr/src/app
 
-# Copia el package.json y package-lock.json
+# Copia los archivos de package.json y package-lock.json
 COPY package*.json ./
 
-# Instala las dependencias
+# Instala las dependencias (esto incluirá nodemon)
 RUN npm install
 
 # Copia el resto de los archivos de la aplicación
 COPY . .
 
-# Exponer el puerto
+# Expone el puerto que usará la aplicación
 EXPOSE 3000
 
-# Comando para iniciar el servicio
-CMD ["node", "index.js"]
+# Comando para iniciar la aplicación en modo desarrollo
+CMD ["npm", "run", "dev"]

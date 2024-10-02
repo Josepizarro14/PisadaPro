@@ -13,6 +13,8 @@ services:
       - db
       - product-service
       - rabbitmq
+    networks:
+      - pisadapro_network  # Conectado a la red
 
   db:
     image: postgres
@@ -24,6 +26,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - pisadapro_network  # Conectado a la red
 
   mongodb:
     image: mongo
@@ -31,6 +35,8 @@ services:
       - mongo_data:/data/db
     ports:
       - "27017:27017"
+    networks:
+      - pisadapro_network  # Conectado a la red
 
   product-service:
     build: ./product-service 
@@ -43,6 +49,8 @@ services:
     depends_on:
       - mongodb
       - rabbitmq
+    networks:
+      - pisadapro_network  # Conectado a la red
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -53,7 +61,7 @@ services:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
     networks:
-      - pisadapro_network
+      - pisadapro_network  # Conectado a la red
 
 networks:
   pisadapro_network:

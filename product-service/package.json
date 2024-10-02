@@ -1,15 +1,18 @@
 {
-    "name": "product-service",
-    "version": "1.0.0",
-    "description": "Microservice for product management",
-    "main": "index.js",
-    "scripts": {
-      "start": "node index.js"
-    },
-    "dependencies": {
-      "express": "^4.17.1",
-      "mongoose": "^5.13.8",
-      "dotenv": "^8.2.0"
-    }
+  "name": "product-service",
+  "version": "1.0.0",
+  "description": "Microservice for product management",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.13.8",
+    "dotenv": "^8.2.0"
   }
-  
+}

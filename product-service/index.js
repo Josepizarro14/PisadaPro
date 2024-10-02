@@ -3,11 +3,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
+// Crear una aplicación de Express
+const app = express(); // Cambié esto para evitar duplicados
+
 // Cargar variables de entorno
 dotenv.config();
 
-// Crear una aplicación de Express
-const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Middleware para parsear el cuerpo de las solicitudes JSON
 app.use(express.json());
@@ -40,8 +42,12 @@ app.post('/products', async (req, res) => {
     res.status(201).send(product);
 });
 
+// Ruta raíz
+app.get('/', (req, res) => {
+    res.send('Bienvenido al servicio de producto');
+});
+
 // Iniciar el servidor
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

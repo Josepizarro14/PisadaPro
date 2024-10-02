@@ -1,12 +1,16 @@
-from flask import render_template, request, redirect, url_for, flash, abort
-from .models import Cliente  # Asegúrate de importar tu modelo Cliente
-import time
-
+from flask import render_template, request, redirect, url_for, flash, abort, Blueprint, jsonify
+from .models import Cliente  
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
+import time, requests
 
+admin_bp = Blueprint('admin', __name__)
 
-    # Ruta para la página de inicio
+# URL base de tu microservicio de productos
+PRODUCT_SERVICE_URL = "http://localhost:3000"
+api = Blueprint('api', __name__)
+ # Ruta para la página de inicio
+
 def load_routes(app, db):  
     @app.route('/')
     def home():
@@ -225,6 +229,73 @@ def load_routes(app, db):
                     return redirect(url_for('edit_profile'))
 
             return render_template('edit_profile.html', cliente=current_user)
+    
+    # Ruta para el control de inventario
+
+    @app.route('/create_product', methods=['GET', 'POST'])
+    @login_required
+    def create_product():
+        if current_user.rol != 'administrador':
+            abort(403)  # Acceso prohibido si no es administrador
+
+        if request.method == 'POST':
+            nombre = request.form['nombre']
+            descripcion = request.form['descripcion']
+            precio = request.form['precio']
+            categoria = request.form['categoria']
+            stock = request.form['stock']
+            imagen = request.form['imagen']
+
+            try:
+                # Hacer una solicitud POST a tu microservicio de productos
+                response = requests.post('http://localhost:3000/products/create', json={
+                    'nombre': nombre,
+                    'descripcion': descripcion,
+                    'precio': precio,
+                    'categoria': categoria,
+                    'stock': stock,
+                    'imagen': imagen
+                })
+
+                if response.status_code == 201:
+                    flash('Producto creado exitosamente.', 'success')
+                    return redirect(url_for('inventory_control'))
+                else:
+                    flash('Error al crear el producto: {}'.format(response.json().get('error', 'Error desconocido')), 'danger')
+
+            except Exception as e:
+                flash(f'Error al crear producto: {e}', 'danger')
+
+        return render_template('create_product.html')  # Asegúrate de tener esta plantilla
 
 
+    
+    
+    @app.route('/inventory_control', methods=['GET', 'POST'])
+    @login_required
+    def inventory_control():
+        if request.method == 'POST':
+            # Lógica para agregar un producto
+            product_data = {
+                'name': request.form['name'],
+                'description': request.form['description'],
+                'price': request.form['price'],
+                'category': request.form['category'],
+                'stock': request.form['stock'],
+                'image': request.form['image']
+            }
+            response = requests.post(f"{PRODUCT_SERVICE_URL}/products", json=product_data)
 
+            if response.status_code == 201:
+                flash("Producto agregado con éxito!", "success")
+                return redirect(url_for('admin.inventory_control'))
+            else:
+                flash("Error al agregar el producto", "error")
+        
+        # Obtener los productos existentes
+        response = requests.get(f"{PRODUCT_SERVICE_URL}/products")
+        products = response.json() if response.status_code == 200 else []
+
+        return render_template('inventory_control.html', products=products)
+
+        

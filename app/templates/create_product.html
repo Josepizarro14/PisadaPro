@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Agregar Producto</h2>
+    <form method="POST" action="http://localhost:3001/create_product"> <!-- Cambia localhost:3001 según el puerto del microservicio de productos -->
+        <div class="form-group">
+            <label for="name">Nombre</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Descripción</label>
+            <textarea name="description" class="form-control" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="price">Precio</label>
+            <input type="number" name="price" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="category">Categoría</label>
+            <input type="text" name="category" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock</label>
+            <input type="number" name="stock" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="image_url">URL de la Imagen</label>
+            <input type="text" name="image_url" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar Producto</button>
+    </form>
+</div>
+{% endblock %}
