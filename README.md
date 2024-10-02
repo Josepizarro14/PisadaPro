@@ -35,3 +35,9 @@ El proyecto sigue la estructura recomendada por Flask para facilitar la organiza
 * [Dockerfile]          # Utilización de Python para descargar las librerías
 * [requirements.txt]    # Librerías necesarias para el correcto funcionamiento
 
+## Inicio de sesión
+
+Para la creación de usuario hay 2 roles, cliente y administrador.
+Para poder entrar como administrador, las credenciales son las siguientes: correo: admin@example.com y contraseña: admin123
+Se crea este usuario por default.
+
