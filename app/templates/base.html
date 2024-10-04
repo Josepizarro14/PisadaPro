@@ -73,7 +73,7 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container mt-5 {% if request.path == '/register' %}register-page{% endif %}">
         {% block content %}
         {% endblock %}
     </div>
