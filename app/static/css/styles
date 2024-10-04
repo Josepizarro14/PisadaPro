@@ -1,0 +1,17 @@
+/* Imagen de fondo para toda la pantalla */
+body {
+    background-image: url('../static/images/fondo_home.jpg'); /* Cambia esto por la ruta de tu imagen */
+    background-size: cover; /* La imagen cubre toda la pantalla */
+    background-position: center; /* La imagen está centrada */
+    background-repeat: no-repeat; /* No repite la imagen */
+    background-attachment: fixed; /* La imagen de fondo permanece fija mientras se hace scroll */
+    background-color: rgba(0, 0, 0, 0.5); /* Color de fondo negro con 50% de transparencia para mayor contraste */
+}
+
+/* Hacer que el fondo sea semi-transparente */
+.container {
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco con 80% de transparencia */
+    padding: 20px;
+    border-radius: 10px; /* Esquinas redondeadas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave alrededor del formulario */
+}
