@@ -26,8 +26,6 @@ services:
       POSTGRES_DB: pisadaprodb_users
     volumes:
       - user_postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   # Microservicio de Productos
   product-service:
@@ -51,8 +49,6 @@ services:
       MONGO_INITDB_DATABASE: pisadapro_products
     volumes:
       - product_mongo_data:/data/db
-    ports:
-      - "27017:27017"
 
   # Microservicio de Catálogos
   catalog-service:
@@ -76,8 +72,6 @@ services:
       MONGO_INITDB_DATABASE: pisadapro_catalogs
     volumes:
       - catalog_mongo_data:/data/db
-    ports:
-      - "27018:27018"
 
   # Microservicio de Carrito
   cart-service:
@@ -104,8 +98,6 @@ services:
       POSTGRES_DB: pisadaprodb_cart
     volumes:
       - cart_postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
 
   # Frontend en React
   frontend:
@@ -116,15 +108,18 @@ services:
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: "http://localhost:5000"
+      REACT_APP_USER_SERVICE_URL: "http://user-service:5000"
+      REACT_APP_PRODUCT_SERVICE_URL: "http://product-service:5001"
+      REACT_APP_CATALOG_SERVICE_URL: "http://catalog-service:5002"
+      REACT_APP_CART_SERVICE_URL: "http://cart-service:5003"
     command: ["npm", "run", "start"]
 
   # RabbitMQ para comunicación entre microservicios
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"  # Puerto para comunicación
-      - "15672:15672"  # Interfaz de administración web
+      - "5672:5672"     # Puerto para comunicación
+      - "15672:15672"   # Interfaz de administración web
 
 volumes:
   user_postgres_data:
