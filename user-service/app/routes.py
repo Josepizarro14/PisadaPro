@@ -1,169 +1,149 @@
-from flask import render_template, request, redirect, url_for, flash, abort
+from flask import Flask, request, jsonify, abort, flash
 from .models import Cliente  # Asegúrate de importar tu modelo Cliente
-import time
-
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
-
-    # Ruta para la página de inicio
 def load_routes(app, db):  
-    @app.route('/')
+    # Ruta para la página de inicio (opcional, podría no ser necesaria para una API)
+    @app.route('/', methods=['GET'])
     def home():
-        #return '¡Hola, mundo!'
-        return render_template('home.html')  # Asegúrate de tener un template para el home
+        return jsonify(message='¡Bienvenido a la API!')
 
-    # Ruta para la página "Sobre nosotros"
-    @app.route('/about')
-    def about():
-        return render_template('about.html')
-        
-        # Ruta para el registro de usuarios
-    @app.route('/register', methods=['GET', 'POST'])
+    # Ruta para el registro de usuarios
+    @app.route('/api/register', methods=['POST'])
     def register():
-        if request.method == 'POST':
-            rut_persona = request.form['rut_persona']
-            nombre = request.form['nombre']
-            apellido = request.form['apellido']
-            direccion = request.form['direccion']
-            comuna = request.form['comuna']
-            region = request.form['region']
-            email = request.form['email']
-            telefono = request.form['telefono']
-            contrasena = request.form['contrasena']
+        data = request.get_json()  # Obtener los datos en formato JSON
 
-            # Verificar si el correo ya está registrado
-            cliente_existente = Cliente.query.filter_by(email=email).first()
-            if cliente_existente:
-                flash('Este correo ya está registrado. Por favor, inicie sesión.', 'warning')
-                return render_template('register.html')
+        rut_persona = data.get('rut_persona')
+        nombre = data.get('nombre')
+        apellido = data.get('apellido')
+        direccion = data.get('direccion')
+        comuna = data.get('comuna')
+        region = data.get('region')
+        email = data.get('email')
+        telefono = data.get('telefono')
+        contrasena = data.get('contrasena')
 
-            # Crear nuevo cliente
-            nuevo_cliente = Cliente(
-                rut_persona=rut_persona,
-                nombre=nombre,
-                apellido=apellido,
-                direccion=direccion,
-                comuna=comuna,
-                region=region,
-                email=email,
-                telefono=telefono,
-                contrasena=contrasena
-            )
+        # Verificar si el correo ya está registrado
+        cliente_existente = Cliente.query.filter_by(email=email).first()
+        if cliente_existente:
+            return jsonify({'message': 'Este correo ya está registrado.'}), 400
 
-            # Guardar en la base de datos
-            try:
-                db.session.add(nuevo_cliente)
-                db.session.commit()
-                flash('Registro exitoso. Ahora puedes iniciar sesión.', 'success')
-                return render_template('register.html')
-            except Exception as e:
-                flash(f'Ocurrió un error al registrarte: {e}', 'danger')
-                db.session.rollback()
+        # Crear nuevo cliente
+        nuevo_cliente = Cliente(
+            rut_persona=rut_persona,
+            nombre=nombre,
+            apellido=apellido,
+            direccion=direccion,
+            comuna=comuna,
+            region=region,
+            email=email,
+            telefono=telefono,
+            contrasena=generate_password_hash(contrasena)  # Hashear la contraseña
+        )
 
-        return render_template('register.html')
+        # Guardar en la base de datos
+        try:
+            db.session.add(nuevo_cliente)
+            db.session.commit()
+            return jsonify({'message': 'Registro exitoso. Ahora puedes iniciar sesión.'}), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Ocurrió un error al registrarte: {e}'}), 500
 
-
-
-
-    # Ruta para cerrar sesión (lógica por implementar)
-    @app.route('/logout')
-    @login_required  # Asegúrate de que el usuario esté autenticado
+    # Ruta para cerrar sesión
+    @app.route('/api/logout', methods=['POST'])
+    @login_required
     def logout():
         logout_user()  # Cierra la sesión del usuario
-        flash('Has cerrado sesión exitosamente.', 'info')
-        return redirect(url_for('home'))
-
+        return jsonify({'message': 'Has cerrado sesión exitosamente.'}), 200
 
     # Ruta para el panel de administración
-    @app.route('/admin', methods=['GET', 'POST'])
+    @app.route('/api/admin', methods=['GET'])
     @login_required
     def admin():
         if current_user.rol != 'administrador':
             abort(403)  # Acceso prohibido si no es administrador
         clientes = Cliente.query.all()  # Obtener todos los clientes
-        return render_template('admin.html', clientes=clientes)
-        
+        return jsonify([cliente.to_dict() for cliente in clientes])  # Asegúrate de que tu modelo tenga un método to_dict()
+
     # Ruta para crear un nuevo cliente
-    @app.route('/create_client', methods=['GET', 'POST'])
+    @app.route('/api/create_client', methods=['POST'])
+    @login_required  # Asegúrate de que el usuario esté autenticado
     def create_client():
-        if request.method == 'POST':
-            rut_persona = request.form['rut_persona']
-            nombre = request.form['nombre']
-            apellido = request.form['apellido']
-            direccion = request.form['direccion']
-            comuna = request.form['comuna']
-            region = request.form['region']
-            email = request.form['email']
-            telefono = request.form['telefono']
-            rol = request.form['rol']
-            contrasena = request.form['contrasena']
+        data = request.get_json()
 
-            # Verificar si el correo ya está registrado
-            cliente_existente = Cliente.query.filter_by(email=email).first()
-            if cliente_existente:
-                flash('Este correo ya está registrado.', 'warning')
-                return redirect(url_for('create_client'))
+        rut_persona = data.get('rut_persona')
+        nombre = data.get('nombre')
+        apellido = data.get('apellido')
+        direccion = data.get('direccion')
+        comuna = data.get('comuna')
+        region = data.get('region')
+        email = data.get('email')
+        telefono = data.get('telefono')
+        rol = data.get('rol')
+        contrasena = data.get('contrasena')
 
-            # Crear nuevo cliente
-            nuevo_cliente = Cliente(
-                rut_persona=rut_persona,
-                nombre=nombre,
-                apellido=apellido,
-                direccion=direccion,
-                comuna=comuna,
-                region=region,
-                email=email,
-                telefono=telefono,
-                contrasena=contrasena,
-                rol=rol
-            )
+        # Verificar si el correo ya está registrado
+        cliente_existente = Cliente.query.filter_by(email=email).first()
+        if cliente_existente:
+            return jsonify({'message': 'Este correo ya está registrado.'}), 400
 
-            try:
-                db.session.add(nuevo_cliente)
-                db.session.commit()
-                flash('Cliente creado exitosamente.', 'success')
-                return redirect(url_for('admin'))  # Redirigir al panel de administración
-            except Exception as e:
-                flash(f'Error al crear cliente: {e}', 'danger')
-                db.session.rollback()
+        # Crear nuevo cliente
+        nuevo_cliente = Cliente(
+            rut_persona=rut_persona,
+            nombre=nombre,
+            apellido=apellido,
+            direccion=direccion,
+            comuna=comuna,
+            region=region,
+            email=email,
+            telefono=telefono,
+            contrasena=generate_password_hash(contrasena),
+            rol=rol
+        )
 
-        return render_template('create_client.html')
+        try:
+            db.session.add(nuevo_cliente)
+            db.session.commit()
+            return jsonify({'message': 'Cliente creado exitosamente.'}), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Error al crear cliente: {e}'}), 500
 
-    @app.route('/edit_client/<email>', methods=['GET', 'POST'])
+    @app.route('/api/edit_client/<email>', methods=['PUT'])
+    @login_required
     def edit_client(email):
         cliente = Cliente.query.filter_by(email=email).first()
-        if request.method == 'POST':
-            # Actualizar otros campos del cliente
-            cliente.rut_persona = request.form['rut_persona']
-            cliente.nombre = request.form['nombre']
-            cliente.apellido = request.form['apellido']
-            cliente.direccion = request.form['direccion']
-            cliente.comuna = request.form['comuna']
-            cliente.region = request.form['region']
-            cliente.email = request.form['email']
-            cliente.telefono = request.form['telefono']
-            cliente.rol = request.form['rol']  # Actualizar el rol si se cambia
+        if not cliente:
+            return jsonify({'message': 'Cliente no encontrado.'}), 404
 
-            # Manejar el campo de contraseña
-            nueva_contrasena = request.form['contrasena']
-            if nueva_contrasena:  # Solo actualizar la contraseña si se ingresa una nueva
-                cliente.contrasena = generate_password_hash(nueva_contrasena)
+        data = request.get_json()
 
-            try:
-                db.session.commit()
-                flash('Cliente actualizado correctamente.', 'success')
-            except Exception as e:
-                db.session.rollback()
-                flash(f'Ocurrió un error: {e}', 'danger')
+        cliente.rut_persona = data.get('rut_persona', cliente.rut_persona)
+        cliente.nombre = data.get('nombre', cliente.nombre)
+        cliente.apellido = data.get('apellido', cliente.apellido)
+        cliente.direccion = data.get('direccion', cliente.direccion)
+        cliente.comuna = data.get('comuna', cliente.comuna)
+        cliente.region = data.get('region', cliente.region)
+        cliente.telefono = data.get('telefono', cliente.telefono)
+        cliente.rol = data.get('rol', cliente.rol)
 
-            return redirect(url_for('admin'))
+        # Manejar el campo de contraseña
+        nueva_contrasena = data.get('contrasena')
+        if nueva_contrasena:  # Solo actualizar la contraseña si se ingresa una nueva
+            cliente.contrasena = generate_password_hash(nueva_contrasena)
 
-        return render_template('edit_client.html', cliente=cliente)
-
+        try:
+            db.session.commit()
+            return jsonify({'message': 'Cliente actualizado correctamente.'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Ocurrió un error: {e}'}), 500
 
     # Ruta para eliminar un cliente
-    @app.route('/delete_client/<email>', methods=['POST'])
+    @app.route('/api/delete_client/<email>', methods=['DELETE'])
+    @login_required
     def delete_client(email):
         cliente = Cliente.query.filter_by(email=email).first()
         
@@ -171,60 +151,45 @@ def load_routes(app, db):
             try:
                 db.session.delete(cliente)
                 db.session.commit()
-                flash('Cliente eliminado exitosamente.', 'success')
+                return jsonify({'message': 'Cliente eliminado exitosamente.'}), 200
             except Exception as e:
-                flash(f'Error al eliminar cliente: {e}', 'danger')
                 db.session.rollback()
+                return jsonify({'message': f'Error al eliminar cliente: {e}'}), 500
         else:
-            flash('Cliente no encontrado.', 'danger')
-        
-        return redirect(url_for('admin'))
+            return jsonify({'message': 'Cliente no encontrado.'}), 404
 
-    @app.route('/login', methods=['GET', 'POST'])
+    @app.route('/api/login', methods=['POST'])
     def login():
-        if request.method == 'POST':
-            email = request.form['email']
-            password = request.form['password']
-            
-            cliente = Cliente.query.filter_by(email=email).first()
-            if cliente and cliente.check_password(password):  # Cambia aquí
-                login_user(cliente)  # Inicia sesión
-                flash('Inicio de sesión exitoso.', 'success')
-                return redirect(url_for('home'))
-            else:
-                flash('Correo o contraseña incorrectos.', 'danger')
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
         
-        return render_template('login.html')
+        cliente = Cliente.query.filter_by(email=email).first()
+        if cliente and check_password_hash(cliente.contrasena, password):  # Cambia aquí
+            login_user(cliente)  # Inicia sesión
+            return jsonify({'message': 'Inicio de sesión exitoso.'}), 200
+        else:
+            return jsonify({'message': 'Correo o contraseña incorrectos.'}), 401
 
-    @app.route('/edit_profile', methods=['GET', 'POST'])
+    @app.route('/api/edit_profile', methods=['PUT'])
     @login_required
     def edit_profile():
-        with app.app_context():  # Asegura que hay un contexto de aplicación
-            if request.method == 'POST':
-                # Obtener los datos del formulario
-                current_user.nombre = request.form.get('nombre')
-                current_user.apellido = request.form.get('apellido')
-                current_user.direccion = request.form.get('direccion')
-                current_user.comuna = request.form.get('comuna')
-                current_user.region = request.form.get('region')
-                current_user.email = request.form.get('email')
-                current_user.telefono = request.form.get('telefono')
+        data = request.get_json()
+        current_user.nombre = data.get('nombre', current_user.nombre)
+        current_user.apellido = data.get('apellido', current_user.apellido)
+        current_user.direccion = data.get('direccion', current_user.direccion)
+        current_user.comuna = data.get('comuna', current_user.comuna)
+        current_user.region = data.get('region', current_user.region)
+        current_user.email = data.get('email', current_user.email)
+        current_user.telefono = data.get('telefono', current_user.telefono)
 
-                nueva_contrasena = request.form.get('contrasena')
-                if nueva_contrasena:
-                    # Si se ingresa una nueva contraseña, se hashea y actualiza
-                    current_user.contrasena = generate_password_hash(nueva_contrasena)
+        nueva_contrasena = data.get('contrasena')
+        if nueva_contrasena:
+            current_user.contrasena = generate_password_hash(nueva_contrasena)
 
-                try:
-                    # Guardar los cambios en la base de datos
-                    db.session.commit()
-                    flash('Perfil actualizado con éxito', 'success')
-                    return redirect(url_for('home'))
-                except Exception as e:
-                    flash(f'Error al actualizar el perfil: {e}', 'danger')
-                    return redirect(url_for('edit_profile'))
-
-            return render_template('edit_profile.html', cliente=current_user)
-
-
-
+        try:
+            db.session.commit()
+            return jsonify({'message': 'Perfil actualizado con éxito.'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Error al actualizar el perfil: {e}'}), 500

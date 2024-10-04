@@ -16,7 +16,6 @@ class Cliente(db.Model, UserMixin):
     contrasena = db.Column(db.String(128), nullable=False)
     rol = db.Column(db.String(20), nullable=False, default='cliente')  # 'cliente' o 'administrador'
 
-
     def __init__(self, rut_persona, nombre, apellido, direccion, comuna, region, email, telefono, contrasena, rol='cliente'):
         self.rut_persona = rut_persona
         self.nombre = nombre
@@ -37,3 +36,16 @@ class Cliente(db.Model, UserMixin):
 
     def get_id(self):
         return self.email
+
+    def to_dict(self):
+        return {
+            "rut_persona": self.rut_persona,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
+            "direccion": self.direccion,
+            "comuna": self.comuna,
+            "region": self.region,
+            "email": self.email,
+            "telefono": self.telefono,
+            "rol": self.rol
+        }

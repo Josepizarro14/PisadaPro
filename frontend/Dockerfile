@@ -11,6 +11,8 @@ COPY interfaz/package.json interfaz/package-lock.json ./
 # Instalar dependencias
 RUN npm install
 
+RUN npm install react-router-dom
+
 # Copiar el resto del código de la aplicación
 COPY interfaz .
 
