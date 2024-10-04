@@ -1,29 +1,133 @@
 version: '3.8'
 
 services:
-  web:
-    build: .
+  # Microservicio de Usuarios
+  user-service:
+    build: ./user-service
     volumes:
-      - .:/app
+      - ./user-service:/app
     command: python -m app.app
     ports:
       - "5000:5000"
     environment:
-      DATABASE_URL: "postgresql://user:password@db/pisadaprodb"
+      DATABASE_URL: "postgresql://user:password@user-db/pisadaprodb_users"
       FLASK_DEBUG: "1"
+      RABBITMQ_URL: "amqp://rabbitmq:5672"
     depends_on:
-      - db
+      - user-db
+      - rabbitmq
 
-  db:
+  # Base de datos para Microservicio de Usuarios
+  user-db:
     image: postgres
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: pisadaprodb
+      POSTGRES_DB: pisadaprodb_users
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - user_postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
+  # Microservicio de Productos
+  product-service:
+    build: ./product-service
+    volumes:
+      - ./product-service:/app
+    command: node app/app.js
+    ports:
+      - "5001:5001"
+    environment:
+      MONGO_URL: "mongodb://product-db:27017/pisadapro_products"
+      RABBITMQ_URL: "amqp://rabbitmq:5672"
+    depends_on:
+      - product-db
+      - rabbitmq
+
+  # Base de datos para Microservicio de Productos
+  product-db:
+    image: mongo
+    environment:
+      MONGO_INITDB_DATABASE: pisadapro_products
+    volumes:
+      - product_mongo_data:/data/db
+    ports:
+      - "27017:27017"
+
+  # Microservicio de Catálogos
+  catalog-service:
+    build: ./catalog-service
+    volumes:
+      - ./catalog-service:/app
+    command: node app/app.js
+    ports:
+      - "5002:5002"
+    environment:
+      MONGO_URL: "mongodb://catalog-db:27018/pisadapro_catalogs"
+      RABBITMQ_URL: "amqp://rabbitmq:5672"
+    depends_on:
+      - catalog-db
+      - rabbitmq
+
+  # Base de datos para Microservicio de Catálogos
+  catalog-db:
+    image: mongo
+    environment:
+      MONGO_INITDB_DATABASE: pisadapro_catalogs
+    volumes:
+      - catalog_mongo_data:/data/db
+    ports:
+      - "27018:27018"
+
+  # Microservicio de Carrito
+  cart-service:
+    build: ./cart-service
+    volumes:
+      - ./cart-service:/app
+    command: python -m app.app
+    ports:
+      - "5003:5003"
+    environment:
+      DATABASE_URL: "postgresql://user:password@cart-db/pisadaprodb_cart"
+      FLASK_DEBUG: "1"
+      RABBITMQ_URL: "amqp://rabbitmq:5672"
+    depends_on:
+      - cart-db
+      - rabbitmq
+
+  # Base de datos para Microservicio de Carrito
+  cart-db:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pisadaprodb_cart
+    volumes:
+      - cart_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  # Frontend en React
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend/interfaz:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: "http://localhost:5000"
+    command: ["npm", "run", "start"]
+
+  # RabbitMQ para comunicación entre microservicios
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"  # Puerto para comunicación
+      - "15672:15672"  # Interfaz de administración web
+
 volumes:
-  postgres_data:
+  user_postgres_data:
+  product_mongo_data:
+  catalog_mongo_data:
+  cart_postgres_data:

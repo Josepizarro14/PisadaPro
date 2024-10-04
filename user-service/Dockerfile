@@ -1,18 +1,22 @@
-# Usa una imagen base de Python
-FROM python:3.9
+# Dockerfile
 
-# Establece el directorio de trabajo en el contenedor
+FROM python:3.9-slim
+
 WORKDIR /app
 
-# Copia el archivo de dependencias e instálalas
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Copiar el archivo de dependencias
+COPY requirements.txt requirements.txt
 
-# Copia el resto del código de la aplicación al contenedor
+# Instalar las dependencias
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar el código de la aplicación
 COPY . .
 
-# Expone el puerto en el que Flask correrá
-EXPOSE 5000
+# Establecer FLASK_APP y activar modo debug
+ENV FLASK_APP=app
+ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
 
-# Define el comando para ejecutar la aplicación
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+# Ejecutar Flask
+CMD ["flask", "run", "--host=0.0.0.0"]
