@@ -8,7 +8,8 @@ body {
 
 /* Estilos específicos para la página de registro */
 .register-page {
-    background-image: url('../static/images/fondo_home.jpg'); /* Cambia esto por la ruta de tu imagen */
+    background-image: url('../images/fondo_home.jpg');
+    /* Cambia esto por la ruta de tu imagen */
     background-size: cover; /* La imagen cubre toda la pantalla */
     background-position: center; /* La imagen está centrada */
     background-repeat: no-repeat; /* No repite la imagen */
