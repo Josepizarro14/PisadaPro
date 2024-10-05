@@ -1,28 +1,26 @@
-/* styles.css */
-
 /* Imagen de fondo para toda la pantalla */
 body {
-    margin: 0; /* Asegúrate de que no haya margen en el body */
-    padding: 0; /* Asegúrate de que no haya padding en el body */
+    margin: 0;
+    padding: 0;
 }
 
 /* Estilos específicos para la página de registro */
 .register-page {
-    background-image: url('../images/fondo_home.jpg');
-    /* Cambia esto por la ruta de tu imagen */
+    background-image: url('../images/fondo_home.jpg'); /* Ruta a la imagen de fondo */
     background-size: cover; /* La imagen cubre toda la pantalla */
-    background-position: center; /* La imagen está centrada */
-    background-repeat: no-repeat; /* No repite la imagen */
-    background-attachment: fixed; /* La imagen se queda fija mientras haces scroll */
-    height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
+    background-position: center; /* Centrada */
+    background-repeat: no-repeat; /* No se repite */
+    background-attachment: fixed; /* Fija al hacer scroll */
+    height: 100vh; /* Ocupa toda la altura de la pantalla */
 }
 
-/* Ajustar el contenedor del formulario en la página de registro */
+/* Ajuste del contenedor del formulario en la página de registro */
 .register-page .container {
-    max-width: 400px; /* Ancho máximo del formulario */
-    margin: 100px auto; /* Centra el formulario vertical y horizontalmente */
-    background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco con 80% de transparencia */
+    max-width: 400px; /* Limita el ancho del formulario */
+    margin: 100px auto; /* Centra vertical y horizontalmente */
+    background-color: #ffffff; /* Fondo sólido blanco, sin transparencia */
     padding: 20px;
     border-radius: 10px; /* Esquinas redondeadas */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave alrededor del formulario */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
 }
+
