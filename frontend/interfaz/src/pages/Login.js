@@ -7,9 +7,11 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
     const handleLogin = async (e) => {
         e.preventDefault();
+        setSuccessMessage('');
         try {
             const response = await api.post('/login', { email, password });
             
@@ -23,7 +25,8 @@ const Login = () => {
                 const role = response.data.role;
                 console.log(`Rol del usuario: ${role}`);
                 // Redirige o guarda el estado del usuario
-                navigate('/Home');
+                setSuccessMessage('Has iniciado sesión exitosamente.');
+                setTimeout(() => navigate('../'), 2000);
             } else {
                 setError('Credenciales inválidas. Por favor, inténtalo de nuevo.');
             }

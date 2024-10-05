@@ -9,10 +9,12 @@ def load_routes(app, db):
     def home():
         return jsonify(message='¡Bienvenido a la API!')
 
-    # Ruta para el registro de usuarios
     @app.route('/api/register', methods=['POST'])
     def register():
-        data = request.get_json()  # Obtener los datos en formato JSON
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'message': 'No se recibieron datos.'}), 400
 
         rut_persona = data.get('rut_persona')
         nombre = data.get('nombre')
@@ -27,7 +29,7 @@ def load_routes(app, db):
         # Verificar si el correo ya está registrado
         cliente_existente = Cliente.query.filter_by(email=email).first()
         if cliente_existente:
-            return jsonify({'message': 'Este correo ya está registrado.'}), 400
+            return jsonify({'message': 'Este correo ya está registrado. Por favor, inicie sesión.'}), 409
 
         # Crear nuevo cliente
         nuevo_cliente = Cliente(
@@ -39,13 +41,20 @@ def load_routes(app, db):
             region=region,
             email=email,
             telefono=telefono,
-            contrasena=generate_password_hash(contrasena)  # Hashear la contraseña
+            contrasena=contrasena  # Contraseña será hasheada en el método __init__
         )
+        
+        # El método set_password será llamado automáticamente en el __init__
+        # donde se aplica el hashing a la contraseña.
 
         # Guardar en la base de datos
         try:
             db.session.add(nuevo_cliente)
             db.session.commit()
+            
+            # Iniciar sesión automáticamente
+            login_user(nuevo_cliente)
+
             return jsonify({'message': 'Registro exitoso. Ahora puedes iniciar sesión.'}), 201
         except Exception as e:
             db.session.rollback()
@@ -115,14 +124,28 @@ def load_routes(app, db):
     @app.route('/api/login', methods=['POST'])
     def login():
         data = request.get_json()
+        
+        if not data:
+            return jsonify({'message': 'No se recibieron datos.'}), 400
+
         email = data.get('email')
         password = data.get('password')
-        # Verifica las credenciales
-        user = Cliente.query.filter_by(email=email).first()  # Asegúrate de que "Cliente" sea tu modelo correcto
-        if user and check_password_hash(user.contrasena, password):
-            # Aquí puedes agregar el rol del usuario a la respuesta si es necesario
-            return jsonify({'message': 'Inicio de sesión exitoso.', 'role': user.rol}), 200
-        return jsonify({'message': 'Credenciales inválidas.'}), 401
+
+        try:
+            # Intenta obtener el usuario de la base de datos
+            cliente = Cliente.query.filter_by(email=email).first()
+
+            if cliente and cliente.check_password(password):
+                login_user(cliente)  # Inicia sesión
+                return jsonify({'message': 'Inicio de sesión exitoso.', 'role': cliente.rol}), 200
+            
+            return jsonify({'message': 'Credenciales inválidas.'}), 401
+
+        except Exception as e:
+            return jsonify({'message': f'Ocurrió un error al intentar iniciar sesión: {e}'}), 500
+
+
+
 
 
     @app.route('/api/edit_client/<email>', methods=['PUT'])
