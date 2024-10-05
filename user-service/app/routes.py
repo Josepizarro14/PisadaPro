@@ -51,6 +51,7 @@ def load_routes(app, db):
             db.session.rollback()
             return jsonify({'message': f'Ocurrió un error al registrarte: {e}'}), 500
 
+
     # Ruta para cerrar sesión
     @app.route('/api/logout', methods=['POST'])
     @login_required
@@ -111,6 +112,19 @@ def load_routes(app, db):
             db.session.rollback()
             return jsonify({'message': f'Error al crear cliente: {e}'}), 500
 
+    @app.route('/api/login', methods=['POST'])
+    def login():
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        # Verifica las credenciales
+        user = Cliente.query.filter_by(email=email).first()  # Asegúrate de que "Cliente" sea tu modelo correcto
+        if user and check_password_hash(user.contrasena, password):
+            # Aquí puedes agregar el rol del usuario a la respuesta si es necesario
+            return jsonify({'message': 'Inicio de sesión exitoso.', 'role': user.rol}), 200
+        return jsonify({'message': 'Credenciales inválidas.'}), 401
+
+
     @app.route('/api/edit_client/<email>', methods=['PUT'])
     @login_required
     def edit_client(email):
@@ -158,18 +172,6 @@ def load_routes(app, db):
         else:
             return jsonify({'message': 'Cliente no encontrado.'}), 404
 
-    @app.route('/api/login', methods=['POST'])
-    def login():
-        data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
-        
-        cliente = Cliente.query.filter_by(email=email).first()
-        if cliente and check_password_hash(cliente.contrasena, password):  # Cambia aquí
-            login_user(cliente)  # Inicia sesión
-            return jsonify({'message': 'Inicio de sesión exitoso.'}), 200
-        else:
-            return jsonify({'message': 'Correo o contraseña incorrectos.'}), 401
 
     @app.route('/api/edit_profile', methods=['PUT'])
     @login_required
@@ -193,3 +195,5 @@ def load_routes(app, db):
         except Exception as e:
             db.session.rollback()
             return jsonify({'message': f'Error al actualizar el perfil: {e}'}), 500
+    
+    

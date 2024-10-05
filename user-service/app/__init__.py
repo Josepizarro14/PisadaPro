@@ -1,11 +1,14 @@
+# app/__init__.py
 from flask import Flask
 from .database import db, init_db
 from .models import Cliente
 from flask_login import LoginManager
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@db:5432/pisadaprodb_users'
+    CORS(app)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@user-db:5432/pisadaprodb_users'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = 'appweb'  # Cambia esto a una clave más segura
 
@@ -17,13 +20,13 @@ def create_app():
     login_manager.init_app(app)
 
     # Redirigir a la página de inicio de sesión si no está autenticado
-    login_manager.login_view = 'login'  # Ruta para la página de login
+    login_manager.login_view = 'login'
     login_manager.login_message = "Por favor, inicia sesión para acceder a esta página."
 
     # Función para cargar el usuario desde la base de datos
     @login_manager.user_loader
-    def load_user(user_id):
-        return Cliente.query.get(user_id)  # No se necesita convertir a int
+    def load_user(email):  # Cambiado a email
+        return Cliente.query.filter_by(email=email).first()  # Ahora usa email
 
     with app.app_context():
         try:
