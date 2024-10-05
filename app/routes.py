@@ -232,6 +232,14 @@ def load_routes(app, db):
                     return redirect(url_for('edit_profile'))
 
             return render_template('edit_profile.html', cliente=current_user)
-
+    
+    @app.route('/order_registrer')
+    def order_registrer():
+        return render_template('construction.html')
+        
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('construction.html'), 404
+        
 
 
