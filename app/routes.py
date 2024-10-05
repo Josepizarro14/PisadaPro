@@ -4,6 +4,13 @@ import time
 
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask import Blueprint
+
+general_blueprint = Blueprint('general', __name__)
+
+@general_blueprint.route('/under-construction')
+def under_construction():
+    return render_template('construction.html')
 
 
     # Ruta para la página de inicio
