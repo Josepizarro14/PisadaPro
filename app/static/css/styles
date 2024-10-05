@@ -18,7 +18,7 @@ body {
 .register-page .container {
     max-width: 400px; /* Limita el ancho del formulario */
     margin: 100px auto; /* Centra vertical y horizontalmente */
-    background-color: #ffffff; /* Fondo sólido blanco, sin transparencia */
+    background-color: transparent; /* Fondo sólido blanco, sin transparencia */
     padding: 20px;
     border-radius: 10px; /* Esquinas redondeadas */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
