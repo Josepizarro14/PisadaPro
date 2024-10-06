@@ -2,35 +2,28 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import api from '../services/api';
+import '../styles/styles.css'; // Importa el archivo CSS
 
 const Navbar = () => {
-    const { user, logout } = useUser(); // Acceder también a la función logout
+    const { user, logout } = useUser();
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     const userRole = localStorage.getItem('userRole');
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        // Verificar si el usuario está autenticado
         const isAuthenticated = localStorage.getItem('isAuthenticated');
         console.log(`Usuario autenticado: ${isAuthenticated ? 'Sí' : 'No'}`);
     
         if (isAuthenticated) {
             try {
                 const response = await api.post('/logout');
-    
                 if (response.status === 200) {
                     console.log('Logout exitoso en el backend.');
-    
-                    // Eliminar información del localStorage
                     localStorage.removeItem('isAuthenticated');
                     localStorage.removeItem('userName');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('userEmail');
-    
-                    // Llamar a la función logout para actualizar el contexto
-                    logout(); // Esto actualizará el estado de autenticación en el contexto
-    
-                    // Redirigir al login
+                    logout();
                     navigate('/login');
                 } else {
                     console.error('Error al cerrar sesión:', response.status);
@@ -42,11 +35,10 @@ const Navbar = () => {
             console.log('No se puede cerrar sesión: el usuario no está autenticado.');
         }
     };
-    
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-            <div className="container-fluid">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <div className="container">
                 <Link className="navbar-brand" to="/">PisadaPro</Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
