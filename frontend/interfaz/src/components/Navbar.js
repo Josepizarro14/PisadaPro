@@ -1,27 +1,45 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../services/api'; 
+import { useUser } from '../contexts/UserContext';
+import api from '../services/api';
 
 const Navbar = () => {
+    const { user, logout } = useUser(); // Acceder también a la función logout
     const isAuthenticated = localStorage.getItem('isAuthenticated');
-    const userName = localStorage.getItem('userName'); // Guardaste el nombre en localStorage al iniciar sesión
-    const userRole = localStorage.getItem('userRole'); // Guardaste el rol en localStorage al iniciar sesión
+    const userRole = localStorage.getItem('userRole');
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        try {
-            // Llama al endpoint de logout en el backend
-            await api.post('/logout', {}, { withCredentials: true });
-            
-            // Elimina los datos del usuario de localStorage
-            localStorage.removeItem('isAuthenticated');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
+        // Verificar si el usuario está autenticado
+        const isAuthenticated = localStorage.getItem('isAuthenticated');
+        console.log(`Usuario autenticado: ${isAuthenticated ? 'Sí' : 'No'}`);
     
-            // Redirige al login después de cerrar sesión
-            navigate('/login');
-        } catch (error) {
-            console.error('Error al cerrar sesión:', error);
+        if (isAuthenticated) {
+            try {
+                const response = await api.post('/logout');
+    
+                if (response.status === 200) {
+                    console.log('Logout exitoso en el backend.');
+    
+                    // Eliminar información del localStorage
+                    localStorage.removeItem('isAuthenticated');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userEmail');
+    
+                    // Llamar a la función logout para actualizar el contexto
+                    logout(); // Esto actualizará el estado de autenticación en el contexto
+    
+                    // Redirigir al login
+                    navigate('/login');
+                } else {
+                    console.error('Error al cerrar sesión:', response.status);
+                }
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
+        } else {
+            console.log('No se puede cerrar sesión: el usuario no está autenticado.');
         }
     };
     
@@ -48,9 +66,9 @@ const Navbar = () => {
                     <ul className="navbar-nav ms-auto">
                         {isAuthenticated ? (
                             <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Bienvenido, {userName}
-                                </a>
+                                <span className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Bienvenido, {user?.userName || localStorage.getItem('userName')}
+                                </span>
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <li>
                                         <Link className="dropdown-item" to="/update-account">Actualizar cuenta</Link>
@@ -72,11 +90,10 @@ const Navbar = () => {
                                 </ul>
                             </li>
                         ) : (
-                            <>
-                                <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <li className="nav-item dropdown">
+                                <span className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Mi Cuenta
-                                </a>
+                                </span>
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <li>
                                         <Link className="dropdown-item" to="/register">Registrarse</Link>
@@ -86,7 +103,6 @@ const Navbar = () => {
                                     </li>
                                 </ul>
                             </li>
-                            </>
                         )}
                     </ul>
                 </div>

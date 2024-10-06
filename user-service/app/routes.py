@@ -225,7 +225,7 @@ def load_routes(app, db):
         current_user.direccion = data.get('direccion', current_user.direccion)
         current_user.comuna = data.get('comuna', current_user.comuna)
         current_user.region = data.get('region', current_user.region)
-        current_user.email = data.get('email', current_user.email)
+        nuevo_email = data.get('email', current_user.email)  # Almacena el nuevo correo
         current_user.telefono = data.get('telefono', current_user.telefono)
 
         # Verifica si se proporciona una nueva contraseña
@@ -234,6 +234,14 @@ def load_routes(app, db):
             current_user.contrasena = generate_password_hash(nueva_contrasena)
 
         try:
+            # Si el correo cambia, cerrar la sesión
+            if nuevo_email != current_user.email:
+                current_user.email = nuevo_email
+                db.session.commit()  # Guarda los cambios primero
+                return jsonify({'message': 'Perfil actualizado, por favor inicie sesión nuevamente.'}), 200
+            
+            # Si el correo no cambia, simplemente guardar los cambios
+            current_user.email = nuevo_email
             db.session.commit()
             return jsonify({'message': 'Perfil actualizado con éxito.'}), 200
         except Exception as e:
@@ -268,3 +276,19 @@ def load_routes(app, db):
             return jsonify([cliente.to_dict() for cliente in clientes])  # Convertir cada cliente a diccionario
         except Exception as e:
             return jsonify({'message': f'Ocurrió un error: {str(e)}'}), 500
+        
+    @app.route('/api/user', methods=['GET'])
+    @login_required
+    def get_user():
+        """Retorna los datos del usuario actual."""
+        user_info = {
+            'rut_persona': current_user.rut_persona,
+            'nombre': current_user.nombre,
+            'apellido': current_user.apellido,
+            'direccion': current_user.direccion,
+            'comuna': current_user.comuna,
+            'region': current_user.region,
+            'email': current_user.email,
+            'telefono': current_user.telefono
+        }
+        return jsonify(user_info), 200

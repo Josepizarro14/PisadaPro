@@ -173,8 +173,10 @@ const AdminPanel = () => {
                                     id="rut_persona"
                                     value={currentUser.rut_persona}
                                     onChange={(e) => setCurrentUser({ ...currentUser, rut_persona: e.target.value })}
+                                    disabled={isEditing}  // Aquí estamos bloqueando el campo si se está editando
                                 />
                             </div>
+
                             <div className="col-md-6 mb-3">
                                 <label htmlFor="nombre" className="form-label">Nombre</label>
                                 <input

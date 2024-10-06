@@ -11,6 +11,7 @@ import Register from './components/Register';
 import AdminPanel from './pages/AdminPanel'; // Importamos el nuevo componente
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import UpdateAccount from './components/UpdateAccount';
 
 function App() {
     return (
@@ -25,6 +26,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/admin-panel" element={<AdminPanel />} />
+                        <Route path="/update-account" element={<UpdateAccount />} />
                         {/* Agrega más rutas aquí */}
                     </Routes>
                 </div>
