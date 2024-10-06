@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';  // Asegúrate de que esto esté correctamente configurado
@@ -8,54 +9,77 @@ const AdminPanel = () => {
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null); // Inicializa currentUser
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentUser, setCurrentUser] = useState({
+        rut_persona: '',
+        nombre: '',
+        apellido: '',
+        direccion: '',
+        comuna: '',
+        region: '',
+        email: '',
+        telefono: '',
+        contrasena: '',
+        rol: ''
+    });
     const navigate = useNavigate();
 
     useEffect(() => {
         const role = localStorage.getItem('userRole');
         const isAuthenticated = localStorage.getItem('isAuthenticated');
 
-        // Redirigir si no está autenticado
         if (!isAuthenticated) {
             navigate('/login');
             return;
         }
 
-        // Verificar el rol del usuario
         if (role !== 'administrador') {
             alert('No tienes permiso para acceder a esta página.');
-            navigate('/');  // Redirige a la página de inicio si no es administrador
-            return; // Salir de useEffect si no es admin
+            navigate('/');
+            return;
         }
 
         const fetchUsuarios = async () => {
             try {
                 const response = await api.get('/admin');
-                console.log('Respuesta de la API:', response);
                 setUsuarios(response.data);
             } catch (error) {
-                console.error('Error al cargar los usuarios:', error);
                 setError('Error al cargar los usuarios');
             }
         };
 
-        fetchUsuarios();  // Llamar a la función para obtener usuarios
-
+        fetchUsuarios();
     }, [navigate]);
 
     const eliminarUsuario = async (email) => {
         try {
-            await api.delete(`/delete_client/${email}`); // Asegúrate de que este endpoint esté correcto
+            await api.delete(`/delete_client/${email}`);
             setSuccessMessage('Usuario eliminado correctamente');
             setUsuarios(usuarios.filter(user => user.email !== email));
         } catch (error) {
-            console.error('Error al eliminar el usuario:', error);
             setError('Error al eliminar el usuario');
         }
     };
 
-    const handleShowModal = (usuario) => {
-        setCurrentUser(usuario);
+    const handleShowModal = (usuario = null) => {
+        if (usuario) {
+            setIsEditing(true);
+            setCurrentUser(usuario);
+        } else {
+            setIsEditing(false);
+            setCurrentUser({
+                rut_persona: '',
+                nombre: '',
+                apellido: '',
+                direccion: '',
+                comuna: '',
+                region: '',
+                email: '',
+                telefono: '',
+                contrasena: '',
+                rol: ''
+            });
+        }
         setShowModal(true);
     };
 
@@ -66,13 +90,24 @@ const AdminPanel = () => {
 
     const handleEditUser = async () => {
         try {
-            await api.put(`/edit_client/${currentUser.email}`, currentUser); // Ajusta esto según tu API
+            // Actualiza el usuario, utilizando el correo actual
+            await api.put(`/edit_client/${currentUser.rut_persona}`, currentUser);
             setSuccessMessage('Usuario actualizado correctamente');
-            setUsuarios(usuarios.map(user => user.email === currentUser.email ? currentUser : user));
+            setUsuarios(usuarios.map(user => user.rut_persona === currentUser.rut_persona ? currentUser : user));
             handleCloseModal();
         } catch (error) {
-            console.error('Error al actualizar el usuario:', error);
             setError('Error al actualizar el usuario');
+        }
+    };
+
+    const handleCreateUser = async () => {
+        try {
+            await api.post('/create_client', currentUser);
+            setSuccessMessage('Usuario creado correctamente');
+            setUsuarios([...usuarios, currentUser]);
+            handleCloseModal();
+        } catch (error) {
+            setError('Error al crear el usuario');
         }
     };
 
@@ -82,6 +117,8 @@ const AdminPanel = () => {
             <p className="text-center">Aquí puedes gestionar productos, usuarios y más.</p>
             {error && <div className="alert alert-danger">{error}</div>}
             {successMessage && <div className="alert alert-success">{successMessage}</div>}
+
+
 
             <table className="table table-striped table-hover">
                 <thead className="thead-dark">
@@ -118,16 +155,17 @@ const AdminPanel = () => {
                     ))}
                 </tbody>
             </table>
-
-            {/* Modal para editar usuario */}
+            {/* Botón para crear un nuevo usuario */}
+            <button className="btn btn-primary mb-3" onClick={() => handleShowModal()}>Crear Nuevo Usuario</button>
+            {/* Modal para crear/editar usuario */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar Usuario</Modal.Title>
+                    <Modal.Title>{isEditing ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {currentUser && (
-                        <div>
-                            <div className="mb-3">
+                        <div className="row">
+                            <div className="col-md-6 mb-3">
                                 <label htmlFor="rut_persona" className="form-label">RUT</label>
                                 <input
                                     type="text"
@@ -137,7 +175,7 @@ const AdminPanel = () => {
                                     onChange={(e) => setCurrentUser({ ...currentUser, rut_persona: e.target.value })}
                                 />
                             </div>
-                            <div className="mb-3">
+                            <div className="col-md-6 mb-3">
                                 <label htmlFor="nombre" className="form-label">Nombre</label>
                                 <input
                                     type="text"
@@ -147,7 +185,7 @@ const AdminPanel = () => {
                                     onChange={(e) => setCurrentUser({ ...currentUser, nombre: e.target.value })}
                                 />
                             </div>
-                            <div className="mb-3">
+                            <div className="col-md-6 mb-3">
                                 <label htmlFor="apellido" className="form-label">Apellido</label>
                                 <input
                                     type="text"
@@ -157,7 +195,7 @@ const AdminPanel = () => {
                                     onChange={(e) => setCurrentUser({ ...currentUser, apellido: e.target.value })}
                                 />
                             </div>
-                            <div className="mb-3">
+                            <div className="col-md-6 mb-3">
                                 <label htmlFor="direccion" className="form-label">Dirección</label>
                                 <input
                                     type="text"
@@ -167,7 +205,7 @@ const AdminPanel = () => {
                                     onChange={(e) => setCurrentUser({ ...currentUser, direccion: e.target.value })}
                                 />
                             </div>
-                            <div className="mb-3">
+                            <div className="col-md-6 mb-3">
                                 <label htmlFor="comuna" className="form-label">Comuna</label>
                                 <input
                                     type="text"
@@ -177,7 +215,7 @@ const AdminPanel = () => {
                                     onChange={(e) => setCurrentUser({ ...currentUser, comuna: e.target.value })}
                                 />
                             </div>
-                            <div className="mb-3">
+                            <div className="col-md-6 mb-3">
                                 <label htmlFor="region" className="form-label">Región</label>
                                 <input
                                     type="text"
@@ -187,7 +225,21 @@ const AdminPanel = () => {
                                     onChange={(e) => setCurrentUser({ ...currentUser, region: e.target.value })}
                                 />
                             </div>
-                            <div className="mb-3">
+
+                            {/* Campo Email: Editable solo cuando es creación */}
+                            <div className="col-md-6 mb-3">
+                                <label htmlFor="email" className="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    className="form-control"
+                                    id="email"
+                                    value={currentUser.email}
+                                    onChange={(e) => setCurrentUser({ ...currentUser, email: e.target.value })}
+                                />
+                            </div>
+
+
+                            <div className="col-md-6 mb-3">
                                 <label htmlFor="telefono" className="form-label">Teléfono</label>
                                 <input
                                     type="text"
@@ -197,22 +249,37 @@ const AdminPanel = () => {
                                     onChange={(e) => setCurrentUser({ ...currentUser, telefono: e.target.value })}
                                 />
                             </div>
-                            <div className="mb-3">
+                            <div className="col-md-6 mb-3">
                                 <label htmlFor="contrasena" className="form-label">Contraseña</label>
                                 <input
                                     type="password"
                                     className="form-control"
                                     id="contrasena"
+                                    value={currentUser.contrasena}
                                     onChange={(e) => setCurrentUser({ ...currentUser, contrasena: e.target.value })}
                                 />
                             </div>
-                            {/* Agrega más campos según sea necesario */}
+                            <div className="col-md-6 mb-3">
+                                <label htmlFor="rol" className="form-label">Rol</label>
+                                <select
+                                    className="form-select"
+                                    id="rol"
+                                    value={currentUser.rol}
+                                    onChange={(e) => setCurrentUser({ ...currentUser, rol: e.target.value })}
+                                >
+                                    <option value="">Selecciona un rol</option>
+                                    <option value="cliente">Cliente</option>
+                                    <option value="administrador">Administrador</option>
+                                </select>
+                            </div>
                         </div>
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <button className="btn btn-secondary" onClick={handleCloseModal}>Cerrar</button>
-                    <button className="btn btn-primary" onClick={handleEditUser}>Guardar cambios</button>
+                    <button className="btn btn-secondary" onClick={handleCloseModal}>Cancelar</button>
+                    <button className="btn btn-primary" onClick={isEditing ? handleEditUser : handleCreateUser}>
+                        {isEditing ? 'Guardar Cambios' : 'Crear Usuario'}
+                    </button>
                 </Modal.Footer>
             </Modal>
         </div>

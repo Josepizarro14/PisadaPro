@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../services/api'; 
 
 const Navbar = () => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -7,12 +8,23 @@ const Navbar = () => {
     const userRole = localStorage.getItem('userRole'); // Guardaste el rol en localStorage al iniciar sesión
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userRole');
-        navigate('/login');  // Redirige al login después de cerrar sesión
+    const handleLogout = async () => {
+        try {
+            // Llama al endpoint de logout en el backend
+            await api.post('/logout', {}, { withCredentials: true });
+            
+            // Elimina los datos del usuario de localStorage
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+    
+            // Redirige al login después de cerrar sesión
+            navigate('/login');
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+        }
     };
+    
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">

@@ -25,7 +25,7 @@ def load_routes(app, db):
         email = data.get('email')
         telefono = data.get('telefono')
         contrasena = data.get('contrasena')
-
+        
         # Verificar si el correo ya está registrado
         cliente_existente = Cliente.query.filter_by(email=email).first()
         if cliente_existente:
@@ -126,7 +126,6 @@ def load_routes(app, db):
             return jsonify({'message': f'Error al crear cliente: {e}'}), 500
 
     @app.route('/api/login', methods=['POST'])
-    @login_required
     def login():
         data = request.get_json()
 
@@ -157,16 +156,24 @@ def load_routes(app, db):
 
 
 
-    @app.route('/api/edit_client/<email>', methods=['PUT'])
+    @app.route('/api/edit_client/<rut_persona>', methods=['PUT'])
     @login_required
-    def edit_client(email):
-        cliente = Cliente.query.filter_by(email=email).first()
+    def edit_client(rut_persona):
+        cliente = Cliente.query.filter_by(rut_persona=rut_persona).first()
         if not cliente:
             return jsonify({'message': 'Cliente no encontrado.'}), 404
 
         data = request.get_json()
 
-        cliente.rut_persona = data.get('rut_persona', cliente.rut_persona)
+        # Almacenar el nuevo email
+        nuevo_email = data.get('email', cliente.email)
+
+        # Verificar si ya existe un cliente con el nuevo email
+        existing_client = Cliente.query.filter_by(email=nuevo_email).first()
+        if existing_client and existing_client.email != cliente.email:
+            return jsonify({'message': 'Ya existe un cliente con ese correo electrónico.'}), 400
+
+        # Actualizar los campos del cliente
         cliente.nombre = data.get('nombre', cliente.nombre)
         cliente.apellido = data.get('apellido', cliente.apellido)
         cliente.direccion = data.get('direccion', cliente.direccion)
@@ -180,12 +187,16 @@ def load_routes(app, db):
         if nueva_contrasena:  # Solo actualizar la contraseña si se ingresa una nueva
             cliente.contrasena = generate_password_hash(nueva_contrasena)
 
+        # Actualizar el email
+        cliente.email = nuevo_email
+
         try:
             db.session.commit()
             return jsonify({'message': 'Cliente actualizado correctamente.'}), 200
         except Exception as e:
             db.session.rollback()
             return jsonify({'message': f'Ocurrió un error: {e}'}), 500
+
 
     # Ruta para eliminar un cliente
     @app.route('/api/delete_client/<email>', methods=['DELETE'])

@@ -26,10 +26,10 @@ const Login = () => {
                 localStorage.setItem('userRole', response.data.role);
                 localStorage.setItem('userName', response.data.nombre);
                 localStorage.setItem('isAuthenticated', true);
-                
+
                 console.log('Inicio de sesión exitoso');
                 setSuccessMessage('Has iniciado sesión exitosamente.');
-                
+
                 // Redirigir después de 2 segundos
                 setTimeout(() => {
                     navigate('/');
@@ -50,8 +50,26 @@ const Login = () => {
     return (
         <div className="container mt-5">
             <h2 className="text-center">Iniciar Sesión</h2>
-            <div className="row justify-content-center">
+            <div className="row justify-content-center mt-4">
+
+
+
                 <div className="col-md-6">
+
+                    {/* Mostrar mensaje de éxito */}
+                    {successMessage && (
+                        <div className="alert alert-success" role="alert">
+                            {successMessage}
+                        </div>
+                    )}
+
+                    {/* Mostrar mensaje de error */}
+                    {error && (
+                        <div className="alert alert-danger" role="alert">
+                            {error}
+                        </div>
+                    )}
+
                     <form onSubmit={handleLogin} className="border p-4 rounded shadow">
                         <div className="mb-3">
                             <label htmlFor="email" className="form-label">Email</label>
@@ -78,19 +96,7 @@ const Login = () => {
                             />
                         </div>
 
-                        {/* Mostrar mensaje de éxito */}
-                        {successMessage && (
-                            <div className="alert alert-success" role="alert">
-                                {successMessage}
-                            </div>
-                        )}
 
-                        {/* Mostrar mensaje de error */}
-                        {error && (
-                            <div className="alert alert-danger" role="alert">
-                                {error}
-                            </div>
-                        )}
 
                         <button type="submit" className="btn btn-primary w-100">Iniciar Sesión</button>
                     </form>
