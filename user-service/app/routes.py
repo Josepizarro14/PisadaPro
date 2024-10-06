@@ -68,18 +68,14 @@ def load_routes(app, db):
         logout_user()  # Cierra la sesión del usuario
         return jsonify({'message': 'Has cerrado sesión exitosamente.'}), 200
 
+    # Ruta para el panel de administración
     @app.route('/api/admin', methods=['GET'])
     @login_required
     def admin():
-        if not current_user.is_authenticated:
-            abort(403)  # Acceso prohibido si no está autenticado
-
         if current_user.rol != 'administrador':
             abort(403)  # Acceso prohibido si no es administrador
-        
         clientes = Cliente.query.all()  # Obtener todos los clientes
-        return jsonify([cliente.to_dict() for cliente in clientes])
-
+        return jsonify([cliente.to_dict() for cliente in clientes])  # Asegúrate de que tu modelo tenga un método to_dict()
 
     # Ruta para crear un nuevo cliente
     @app.route('/api/create_client', methods=['POST'])
@@ -126,10 +122,9 @@ def load_routes(app, db):
             return jsonify({'message': f'Error al crear cliente: {e}'}), 500
 
     @app.route('/api/login', methods=['POST'])
-    @login_required
     def login():
         data = request.get_json()
-
+        
         if not data:
             return jsonify({'message': 'No se recibieron datos.'}), 400
 
@@ -142,17 +137,13 @@ def load_routes(app, db):
 
             if cliente and cliente.check_password(password):
                 login_user(cliente)  # Inicia sesión
-                # Devuelve el nombre y el rol del usuario
-                return jsonify({
-                    'message': 'Inicio de sesión exitoso.', 
-                    'nombre': cliente.nombre,  # Asegúrate de que 'nombre' es un campo válido en tu modelo
-                    'role': cliente.rol
-                }), 200
-
+                return jsonify({'message': 'Inicio de sesión exitoso.', 'role': cliente.rol}), 200
+            
             return jsonify({'message': 'Credenciales inválidas.'}), 401
 
         except Exception as e:
             return jsonify({'message': f'Ocurrió un error al intentar iniciar sesión: {e}'}), 500
+
 
 
 
@@ -217,9 +208,8 @@ def load_routes(app, db):
         current_user.email = data.get('email', current_user.email)
         current_user.telefono = data.get('telefono', current_user.telefono)
 
-        # Verifica si se proporciona una nueva contraseña
         nueva_contrasena = data.get('contrasena')
-        if nueva_contrasena is not None and nueva_contrasena != '':
+        if nueva_contrasena:
             current_user.contrasena = generate_password_hash(nueva_contrasena)
 
         try:
@@ -228,32 +218,5 @@ def load_routes(app, db):
         except Exception as e:
             db.session.rollback()
             return jsonify({'message': f'Error al actualizar el perfil: {e}'}), 500
-
     
     
-    @app.route('/api/clientes', methods=['GET'])
-    @login_required
-    def get_clientes():
-        """
-        Función para obtener todos los clientes.
-        Solo accesible para usuarios autenticados con rol de administrador.
-        """
-        if current_user.rol != 'administrador':
-            abort(403)  # Acceso prohibido si no es administrador
-        
-        # Obtener todos los clientes
-        clientes = Cliente.query.all()
-        
-        # Convertir los clientes a formato JSON
-        return jsonify([cliente.to_dict() for cliente in clientes])  # Asegúrate de que tu modelo tenga un método to_dict()
-
-    @app.route('/api/admin/clientes', methods=['GET'])
-    def obtener_clientes():
-        if current_user.rol != 'administrador':
-            return jsonify({'message': 'Acceso prohibido.'}), 403
-        
-        try:
-            clientes = Cliente.query.all()  # Obtener todos los clientes
-            return jsonify([cliente.to_dict() for cliente in clientes])  # Convertir cada cliente a diccionario
-        except Exception as e:
-            return jsonify({'message': f'Ocurrió un error: {str(e)}'}), 500

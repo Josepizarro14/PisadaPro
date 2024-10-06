@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Asegúrate de importar Bootstrap
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -9,31 +9,24 @@ const Login = () => {
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
-
     const handleLogin = async (e) => {
         e.preventDefault();
         setSuccessMessage('');
-        setError(''); // Limpiar mensaje de error al intentar nuevamente
         try {
-            // Agrega { withCredentials: true } para enviar cookies
-            const response = await api.post('/login', { email, password }, { withCredentials: true });
-
-            console.log(response.data); // Verificar la respuesta en la consola
-
-            // Verificar si el inicio de sesión fue exitoso
+            const response = await api.post('/login', { email, password });
+            
+            // Verifica la respuesta del servidor
+            console.log(response.data); // Asegúrate de que esto muestre lo que esperas
+            
+            // Aquí puedes hacer algo con la respuesta, como guardar el rol o el token
             if (response.data.message === 'Inicio de sesión exitoso.') {
-                // Almacena información del usuario en localStorage
-                localStorage.setItem('userRole', response.data.role);
-                localStorage.setItem('userName', response.data.nombre);
-                localStorage.setItem('isAuthenticated', true);
-                
-                console.log('Inicio de sesión exitoso');
+                console.log('Inicio de sesión exitoso'); // Asegúrate de ver esto en la consola
+                // Puedes manejar el rol aquí si es necesario
+                const role = response.data.role;
+                console.log(`Rol del usuario: ${role}`);
+                // Redirige o guarda el estado del usuario
                 setSuccessMessage('Has iniciado sesión exitosamente.');
-                
-                // Redirigir después de 2 segundos
-                setTimeout(() => {
-                    navigate('/');
-                }, 2000);
+                setTimeout(() => navigate('../'), 2000);
             } else {
                 setError('Credenciales inválidas. Por favor, inténtalo de nuevo.');
             }
@@ -46,6 +39,9 @@ const Login = () => {
             }
         }
     };
+    
+    
+    
 
     return (
         <div className="container mt-5">
@@ -77,21 +73,7 @@ const Login = () => {
                                 required
                             />
                         </div>
-
-                        {/* Mostrar mensaje de éxito */}
-                        {successMessage && (
-                            <div className="alert alert-success" role="alert">
-                                {successMessage}
-                            </div>
-                        )}
-
-                        {/* Mostrar mensaje de error */}
-                        {error && (
-                            <div className="alert alert-danger" role="alert">
-                                {error}
-                            </div>
-                        )}
-
+                        {error && <div className="alert alert-danger">{error}</div>}
                         <button type="submit" className="btn btn-primary w-100">Iniciar Sesión</button>
                     </form>
                 </div>

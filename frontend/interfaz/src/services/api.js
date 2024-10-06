@@ -1,9 +1,10 @@
 // src/services/api.js
 import axios from 'axios';
 
+const API_URL = 'http://localhost:5000/api';  // Definido aquí
+
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Cambia a la URL de tu backend
-  withCredentials: true, // Esto asegura que se envíen las cookies
+  baseURL: API_URL, // Usar API_URL aquí
 });
 
 // Usar Axios en lugar de fetch para la función de login
