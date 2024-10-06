@@ -4,6 +4,13 @@ import time
 
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask import Blueprint
+
+general_blueprint = Blueprint('general', __name__)
+
+@general_blueprint.route('/under-construction')
+def under_construction():
+    return render_template('construction.html')
 
 
     # Ruta para la página de inicio
@@ -225,6 +232,14 @@ def load_routes(app, db):
                     return redirect(url_for('edit_profile'))
 
             return render_template('edit_profile.html', cliente=current_user)
-
+    
+    @app.route('/order_registrer')
+    def order_registrer():
+        return render_template('construction.html')
+        
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('construction.html'), 404
+        
 
 
