@@ -7,7 +7,8 @@ from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    # Configura CORS para que acepte las cookies
+    CORS(app, supports_credentials=True)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@user-db:5432/pisadaprodb_users'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = 'appweb'  # Cambia esto a una clave más segura
