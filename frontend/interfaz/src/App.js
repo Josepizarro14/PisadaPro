@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import About from './pages/About';  
 import Contact from './pages/Contact'; 
 import Register from './components/Register'; 
+import AdminPanel from './pages/AdminPanel'; // Importamos el nuevo componente
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -23,6 +24,7 @@ function App() {
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/admin-panel" element={<AdminPanel />} />
                         {/* Agrega más rutas aquí */}
                     </Routes>
                 </div>
