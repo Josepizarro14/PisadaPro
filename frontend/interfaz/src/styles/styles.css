@@ -69,28 +69,28 @@ body {
 }
 
 /* Ajustar el tamaño de las tarjetas */
-.card {
+.card2 {
     width: 200px; /* Establecer un ancho específico */
     margin: 0 auto; /* Centrar las tarjetas horizontalmente */
 }
 
 /* Ajustar el tamaño de las imágenes */
-.card-img-top {
+.card2-img-top {
     height: 150px; /* Establecer una altura específica para las imágenes */
     object-fit: cover; /* Mantener la proporción de aspecto de la imagen */
 }
 
 /* Ajustar el espaciado en la tarjeta */
-.card-body {
+.card2-body {
     padding: 0.5rem; /* Reducir el padding dentro de la tarjeta */
 }
 
 /* Ajustar el tamaño del texto */
-.card-title {
+.card2-title {
     font-size: 1.2rem; /* Reducir el tamaño de la fuente del título */
 }
 
-.card-text {
+.card2-text {
     font-size: 0.9rem; /* Reducir el tamaño de la fuente del texto */
 }
 

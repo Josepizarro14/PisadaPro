@@ -47,67 +47,68 @@ const Home = () => {
             <div className="container mt-2">
                 <div className="row">
                     <div className="col-sm-2">
-                        <div className="card h-100">
-                            <img src="/assets/images/imagen1.jpg" className="card-img-top" alt="Zapatilla 1" />
-                            <div className="card-body text-center">
-                                <h5 className="card-title">Zapatilla 1</h5>
-                                <p className="card-text">Descripción breve.</p>
+                        <div className="card h-100 card2">
+                            <img src="/assets/images/imagen1.jpg" className="card-img-top card2-img-top" alt="Zapatilla 1" />
+                            <div className="card-body text-center card2-body">
+                                <h5 className="card-title card2-title">Zapatilla 1</h5>
+                                <p className="card-text card2-text">Descripción breve.</p>
                                 <a href="#" className="btn btn-primary">Ver detalles</a>
                             </div>
                         </div>
                     </div>
                     <div className="col-sm-2">
-                        <div className="card h-100">
-                            <img src="/assets/images/imagen2.jpg" className="card-img-top" alt="Zapatilla 2" />
-                            <div className="card-body text-center">
-                                <h5 className="card-title">Zapatilla 2</h5>
-                                <p className="card-text">Descripción breve.</p>
+                        <div className="card h-100 card2">
+                            <img src="/assets/images/imagen2.jpg" className="card-img-top card2-img-top" alt="Zapatilla 2" />
+                            <div className="card-body text-center card2-body">
+                                <h5 className="card-title card2-title">Zapatilla 2</h5>
+                                <p className="card-text card2-text">Descripción breve.</p>
                                 <a href="#" className="btn btn-primary">Ver detalles</a>
                             </div>
                         </div>
                     </div>
                     <div className="col-sm-2">
-                        <div className="card h-100">
-                            <img src="/assets/images/imagen3.jpg" className="card-img-top" alt="Zapatilla 3" />
-                            <div className="card-body text-center">
-                                <h5 className="card-title">Zapatilla 3</h5>
-                                <p className="card-text">Descripción breve.</p>
+                        <div className="card h-100 card2">
+                            <img src="/assets/images/imagen3.jpg" className="card-img-top card2-img-top" alt="Zapatilla 3" />
+                            <div className="card-body text-center card2-body">
+                                <h5 className="card-title card2-title">Zapatilla 3</h5>
+                                <p className="card-text card2-text">Descripción breve.</p>
                                 <a href="#" className="btn btn-primary">Ver detalles</a>
                             </div>
                         </div>
                     </div>
                     <div className="col-sm-2">
-                        <div className="card h-100">
-                            <img src="/assets/images/imagen4.jpg" className="card-img-top" alt="Zapatilla 4" />
-                            <div className="card-body text-center">
-                                <h5 className="card-title">Zapatilla 4</h5>
-                                <p className="card-text">Descripción breve.</p>
+                        <div className="card h-100 card2">
+                            <img src="/assets/images/imagen4.jpg" className="card-img-top card2-img-top" alt="Zapatilla 4" />
+                            <div className="card-body text-center card2-body">
+                                <h5 className="card-title card2-title">Zapatilla 4</h5>
+                                <p className="card-text card2-text">Descripción breve.</p>
                                 <a href="#" className="btn btn-primary">Ver detalles</a>
                             </div>
                         </div>
                     </div>
                     <div className="col-sm-2">
-                        <div className="card h-100">
-                            <img src="/assets/images/imagen5.jpg" className="card-img-top" alt="Zapatilla 5" />
-                            <div className="card-body text-center">
-                                <h5 className="card-title">Zapatilla 5</h5>
-                                <p className="card-text">Descripción breve.</p>
+                        <div className="card h-100 card2">
+                            <img src="/assets/images/imagen5.jpg" className="card-img-top card2-img-top" alt="Zapatilla 5" />
+                            <div className="card-body text-center card2-body">
+                                <h5 className="card-title card2-title">Zapatilla 5</h5>
+                                <p className="card-text card2-text">Descripción breve.</p>
                                 <a href="#" className="btn btn-primary">Ver detalles</a>
                             </div>
                         </div>
                     </div>
                     <div className="col-sm-2">
-                        <div className="card h-100">
-                            <img src="/assets/images/imagen6.jpg" className="card-img-top" alt="Zapatilla 6" />
-                            <div className="card-body text-center">
-                                <h5 className="card-title">Zapatilla 6</h5>
-                                <p className="card-text">Descripción breve.</p>
+                        <div className="card h-100 card2">
+                            <img src="/assets/images/imagen6.jpg" className="card-img-top card2-img-top" alt="Zapatilla 6" />
+                            <div className="card-body text-center card2-body">
+                                <h5 className="card-title card2-title">Zapatilla 6</h5>
+                                <p className="card-text card2-text">Descripción breve.</p>
                                 <a href="#" className="btn btn-primary">Ver detalles</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
 
 
 
