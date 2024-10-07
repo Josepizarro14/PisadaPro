@@ -6,7 +6,7 @@ body {
 
 /* Estilos específicos para la página de registro */
 .register-page {
-    background-image: url('../images/fondo_home.jpg'); /* Ruta a la imagen de fondo */
+    background-image: url('../images/fondo_registro.jpg'); /* Ruta a la imagen de fondo */
     background-size: cover; /* La imagen cubre toda la pantalla */
     background-position: center; /* Centrada */
     background-repeat: no-repeat; /* No se repite */
