@@ -11,8 +11,8 @@ const Footer = () => {
                 <div className="text-center p-3">
                     <a href="/about" className="text-white">Sobre Nosotros</a> | 
                     <a href="/contact" className="text-white"> Contacto</a> | 
-                    <a href="#" className="text-white">Términos de Servicio</a> | 
-                    <a href="#" className="text-white">Política de Privacidad</a>
+                    <a href="/conditions" className="text-white">Términos de Servicio</a> | 
+                    <a href="/privacity" className="text-white">Política de Privacidad</a>
                 </div>
             </div>
         </footer>

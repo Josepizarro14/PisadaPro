@@ -5,9 +5,10 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';  // Importar el componente Footer
 import Home from './pages/Home';
 import Login from './pages/Login';
-import About from './pages/About';  
-import Contact from './pages/Contact'; 
-import Register from './components/Register'; 
+import About from './pages/About';
+import Contact from './pages/Contact';
+import NotFound from './pages/NotFound';
+import Register from './components/Register';
 import AdminPanel from './pages/AdminPanel'; // Importamos el nuevo componente
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -27,6 +28,7 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/admin-panel" element={<AdminPanel />} />
                         <Route path="/update-account" element={<UpdateAccount />} />
+                        <Route path="*" element={<NotFound />} />
                         {/* Agrega más rutas aquí */}
                     </Routes>
                 </div>
