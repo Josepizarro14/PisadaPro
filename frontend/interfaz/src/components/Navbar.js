@@ -1,24 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import api from '../services/api';
 import '../styles/styles.css'; // Importa el archivo CSS
+import { FaShoppingCart } from 'react-icons/fa'; // Importar el ícono de carrito
 
 const Navbar = () => {
     const { user, logout } = useUser();
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     const userRole = localStorage.getItem('userRole');
     const navigate = useNavigate();
+    const [showCart, setShowCart] = useState(false); // Estado para mostrar/ocultar el modal del carrito
 
     const handleLogout = async () => {
         const isAuthenticated = localStorage.getItem('isAuthenticated');
-        console.log(`Usuario autenticado: ${isAuthenticated ? 'Sí' : 'No'}`);
-    
         if (isAuthenticated) {
             try {
                 const response = await api.post('/logout');
                 if (response.status === 200) {
-                    console.log('Logout exitoso en el backend.');
                     localStorage.removeItem('isAuthenticated');
                     localStorage.removeItem('userName');
                     localStorage.removeItem('userRole');
@@ -31,9 +30,11 @@ const Navbar = () => {
             } catch (error) {
                 console.error('Error al cerrar sesión:', error);
             }
-        } else {
-            console.log('No se puede cerrar sesión: el usuario no está autenticado.');
         }
+    };
+
+    const toggleCartModal = () => {
+        setShowCart(!showCart); // Cambiar el estado para mostrar/ocultar el modal
     };
 
     return (
@@ -56,6 +57,9 @@ const Navbar = () => {
                         </li>
                     </ul>
                     <ul className="navbar-nav ms-auto">
+                        <li className="nav-item">
+                            <FaShoppingCart className="nav-link" style={{ cursor: 'pointer' }} onClick={toggleCartModal} />
+                        </li>
                         {isAuthenticated ? (
                             <li className="nav-item dropdown">
                                 <span className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -99,6 +103,17 @@ const Navbar = () => {
                     </ul>
                 </div>
             </div>
+
+            {/* Modal del Carrito */}
+            {showCart && (
+                <div className="cart-modal">
+                    <div className="cart-content">
+                        <h3>Carrito de compras</h3>
+                        <p>Agregue aquí sus productos</p>
+                        <button onClick={toggleCartModal} className="btn btn-secondary">Cerrar</button>
+                    </div>
+                </div>
+            )}
         </nav>
     );
 };

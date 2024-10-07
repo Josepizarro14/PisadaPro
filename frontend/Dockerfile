@@ -11,7 +11,7 @@ COPY interfaz/package.json interfaz/package-lock.json ./
 # Instalar dependencias
 RUN npm install
 
-RUN npm install axios bootstrap react-router-dom react-bootstrap react-icons formik yup
+RUN npm install axios bootstrap react-router-dom react-bootstrap react-icons formik yup react-icons
 
 # Copiar el resto del código de la aplicación
 COPY interfaz .
