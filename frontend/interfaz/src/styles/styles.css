@@ -1,0 +1,193 @@
+/* Imagen de fondo para toda la pantalla */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilos específicos para la página de registro */
+.register-page {
+    background-image: url('../../public/assets/images/fondo_home.jpg');
+    /* Ruta a la imagen de fondo */
+    background-size: cover;
+    /* La imagen cubre toda la pantalla */
+    background-position: center;
+    /* Centrada */
+    background-repeat: no-repeat;
+    /* No se repite */
+    background-attachment: fixed;
+    /* Fija al hacer scroll */
+    height: 100vh;
+    /* Ocupa toda la altura de la pantalla */
+}
+
+/* Ajuste del contenedor del formulario en la página de registro */
+.register-page .container {
+    max-width: 400px;
+    margin: 100px auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Color blanco con un poco de transparencia */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Navbar.css */
+.navbar {
+    background-color: #f8f9fa;
+    /* Color de fondo */
+    padding: 0;
+    /* Elimina el padding para que el hover ocupe todo el navbar */
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    /* Tamaño de la letra de la marca */
+    font-weight: bold;
+    /* Negrita para la marca */
+    padding: 1rem;
+    /* Espaciado interno para la marca */
+}
+
+.navbar-nav {
+    display: flex;
+    /* Usar flexbox para la distribución */
+    align-items: center;
+    /* Centrar verticalmente los elementos */
+}
+
+.navbar .nav-item .nav-link:hover {
+    background-color: black;
+    color: white !important;
+    /* Forzar que el color del texto sea blanco */
+}
+
+
+.dropdown-item {
+    font-size: 1rem;
+    /* Tamaño de la letra de los elementos del dropdown */
+    transition: background-color 0.3s, color 0.3s;
+    /* Suavizar la transición del hover */
+}
+
+.dropdown-item:hover {
+    background-color: black;
+    /* Color de fondo al hacer hover en el dropdown */
+    color: white;
+    /* Color del texto al hacer hover en el dropdown */
+}
+
+.navbar-toggler {
+    border: none;
+    /* Quitar borde del botón de hamburguesa */
+}
+
+/* Cambiar color de los enlaces al pasar el mouse */
+.navbar-toggler:hover {
+    background-color: black;
+    /* Color de fondo del botón de hamburguesa al hacer hover */
+    border-radius: 0.25rem;
+    /* Bordes redondeados para el botón de hamburguesa */
+    color: white;
+    /* Color del texto al hacer hover */
+}
+
+/* Ajustar el tamaño de las tarjetas */
+.card2 {
+    width: 200px;
+    /* Establecer un ancho específico */
+    margin: 0 auto;
+    /* Centrar las tarjetas horizontalmente */
+}
+
+/* Ajustar el tamaño de las imágenes */
+.card2-img-top {
+    height: 150px;
+    /* Establecer una altura específica para las imágenes */
+    object-fit: cover;
+    /* Mantener la proporción de aspecto de la imagen */
+}
+
+/* Ajustar el espaciado en la tarjeta */
+.card2-body {
+    padding: 0.5rem;
+    /* Reducir el padding dentro de la tarjeta */
+}
+
+/* Ajustar el tamaño del texto */
+.card2-title {
+    font-size: 1.2rem;
+    /* Reducir el tamaño de la fuente del título */
+}
+
+.card2-text {
+    font-size: 0.9rem;
+    /* Reducir el tamaño de la fuente del texto */
+}
+
+.btn {
+    font-size: 0.8rem;
+    /* Reducir el tamaño de la fuente del botón */
+    padding: 0.3rem 0.5rem;
+    /* Reducir el padding del botón */
+}
+
+.notfound-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.notfound-container h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.notfound-container p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.notfound-container .btn {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+}
+
+.cart-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Fondo semitransparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* Z-index alto para asegurar que esté por encima de todo */
+}
+
+.cart-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 10000;
+    /* Asegurarse de que el contenido del modal también esté en el frente */
+}
+
+
+.cart-content h3 {
+    margin-bottom: 1rem;
+}
+
+.cart-content p {
+    margin-bottom: 2rem;
+}
+
+.cart-content .btn {
+    padding: 0.5rem 1rem;
+}
