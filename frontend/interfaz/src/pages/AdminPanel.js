@@ -137,7 +137,7 @@ const AdminPanel = () => {
                 </thead>
                 <tbody>
                     {usuarios.map(usuario => (
-                        <tr key={usuario.email}>
+                        <tr className="mb-1" key={usuario.email}>
                             <td>{usuario.rut_persona}</td>
                             <td>{usuario.nombre}</td>
                             <td>{usuario.apellido}</td>
@@ -148,8 +148,8 @@ const AdminPanel = () => {
                             <td>{usuario.telefono}</td>
                             <td>{usuario.rol}</td>
                             <td>
-                                <button className="btn btn-info btn-sm me-2" onClick={() => handleShowModal(usuario)}>Editar</button>
-                                <button className="btn btn-danger btn-sm" onClick={() => eliminarUsuario(usuario.email)}>Eliminar</button>
+                                <button className="btn btn-info btn-sm me-2 mb-1" onClick={() => handleShowModal(usuario)}>Editar</button>
+                                <button className="btn btn-danger btn-sm mb-md-1" onClick={() => eliminarUsuario(usuario.email)}>Eliminar</button>
                             </td>
                         </tr>
                     ))}

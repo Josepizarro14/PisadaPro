@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import api from '../services/api';
 import '../styles/styles.css'; // Importa el archivo CSS
-import { FaShoppingCart } from 'react-icons/fa'; // Importar el ícono de carrito
 
 const Navbar = () => {
     const { user, logout } = useUser();
@@ -58,8 +57,9 @@ const Navbar = () => {
                     </ul>
                     <ul className="navbar-nav ms-auto">
                         <li className="nav-item">
-                            <FaShoppingCart className="nav-link" style={{ cursor: 'pointer' }} onClick={toggleCartModal} />
+                        <i class="fa-solid fa-cart-shopping nav-link" className="fa-solid fa-cart-shopping" style={{ cursor: 'pointer' }} onClick={toggleCartModal}></i>
                         </li>
+                        
                         {isAuthenticated ? (
                             <li className="nav-item dropdown">
                                 <span className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">

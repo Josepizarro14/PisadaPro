@@ -6,7 +6,7 @@ const NotFound = () => {
   return (
     <div className="notfound-container">
       <h1>404 - Página no encontrada</h1>
-      <p>Lo sentimos, la página que buscas no existe.</p>
+      <p>Lo sentimos, la página que buscas está en construcción.</p>
       <Link to="/" className="btn btn-primary">Volver al inicio</Link>
     </div>
   );

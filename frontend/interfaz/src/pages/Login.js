@@ -48,7 +48,7 @@ const Login = () => {
     };
 
     return (
-        <div className="container mt-5">
+        <div className="container mt-5 ">
             <h2 className="text-center">Iniciar Sesión</h2>
             <div className="row justify-content-center mt-4">
 
