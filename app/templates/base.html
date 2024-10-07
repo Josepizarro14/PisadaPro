@@ -15,6 +15,8 @@
 
         .navbar {
             margin-bottom: 20px;
+            left: 10px;
+            right: 50px;
         }
 
         .navbar-brand img {
@@ -33,7 +35,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto ">
                     <li class="nav-item">
                         <a class="nav-link" href="/">Inicio</a>
                     </li>
@@ -86,8 +88,8 @@
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
         <p class="col-md-4 mb-0 text-body-secondary">&copy; 2024 PisadaPro</p>
     
-        <a href="/" class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-          <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg> <! -----aqui debe ir el logo  ------ >
+        <a href="/" class="col-sm-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" width="55" height="60" alt="PisadaPro Logo"> <! -----aqui debe ir el logo  ------ >
         </a>
     
         <ul class="nav col-md-4 justify-content-end">
@@ -95,7 +97,7 @@
           <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Contacto</a></li>
           <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Preguntas frecuentes</a></li>
           <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Medios de pago</a></li>
-          <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Garantías</a></li>
+          <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Garantía</a></li>
         </ul>
       </footer>
     </div>
