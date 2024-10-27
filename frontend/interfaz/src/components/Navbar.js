@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
-import api from '../services/api';
+import { userApi } from '../services/api';  // Importar la instancia de Axios como exportación nombrada
 import '../styles/styles.css'; // Importa el archivo CSS
 
 const Navbar = () => {
@@ -15,7 +15,7 @@ const Navbar = () => {
         const isAuthenticated = localStorage.getItem('isAuthenticated');
         if (isAuthenticated) {
             try {
-                const response = await api.post('/logout');
+                const response = await userApi.post('/logout');
                 if (response.status === 200) {
                     localStorage.removeItem('isAuthenticated');
                     localStorage.removeItem('userName');

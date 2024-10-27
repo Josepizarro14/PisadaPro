@@ -1,6 +1,6 @@
 // src/components/Register.js
 import React, { useState } from 'react';
-import api from '../services/api';  // Importar la instancia de Axios
+import { userApi } from '../services/api';  // Importar la instancia de Axios como exportación nombrada
 import { useNavigate } from 'react-router-dom';  // Para redirigir al usuario después del registro
 
 const Register = () => {
@@ -30,7 +30,7 @@ const Register = () => {
     console.log('Datos del formulario:', formData); // Imprimir datos antes de enviar
     
     try {
-        const response = await api.post('/register', formData);
+        const response = await userApi.post('/register', formData);
         console.log('Respuesta del servidor:', response.data); // Imprimir respuesta del servidor
         setSuccessMessage(response.data.message);
         setErrorMessage(''); // Limpiar el mensaje de error si el registro es exitoso

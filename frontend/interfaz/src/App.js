@@ -10,6 +10,7 @@ import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
 import Register from './components/Register';
 import AdminPanel from './pages/AdminPanel'; // Importamos el nuevo componente
+import ProductManager from './components/ProductManager';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import UpdateAccount from './components/UpdateAccount';
@@ -28,6 +29,7 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/admin-panel" element={<AdminPanel />} />
                         <Route path="/update-account" element={<UpdateAccount />} />
+                        <Route path='/product-manager' element={<ProductManager />} />
                         <Route path="*" element={<NotFound />} />
                         {/* Agrega más rutas aquí */}
                     </Routes>

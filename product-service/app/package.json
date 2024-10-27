@@ -9,12 +9,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.0"
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.7.3"
   },
-  "script":
-  {
+  "script": {
     "start": "node index.js",
     "start-watch": "WATCHPACK_POLLING=true react-scripts start"
   }
 }
-

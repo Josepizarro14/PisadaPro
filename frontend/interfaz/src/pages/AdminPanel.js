@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';  // Asegúrate de que esto esté correctamente configurado
+import { userApi } from '../services/api';  // Importar la instancia de Axios como exportación nombrada
 import { Modal } from 'react-bootstrap';
 
 const AdminPanel = () => {
@@ -41,7 +41,7 @@ const AdminPanel = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await api.get('/admin');
+                const response = await userApi.get('/admin');
                 setUsuarios(response.data);
             } catch (error) {
                 setError('Error al cargar los usuarios');
@@ -53,7 +53,7 @@ const AdminPanel = () => {
 
     const eliminarUsuario = async (email) => {
         try {
-            await api.delete(`/delete_client/${email}`);
+            await userApi.delete(`/delete_client/${email}`);
             setSuccessMessage('Usuario eliminado correctamente');
             setUsuarios(usuarios.filter(user => user.email !== email));
         } catch (error) {
@@ -91,7 +91,7 @@ const AdminPanel = () => {
     const handleEditUser = async () => {
         try {
             // Actualiza el usuario, utilizando el correo actual
-            await api.put(`/edit_client/${currentUser.rut_persona}`, currentUser);
+            await userApi.put(`/edit_client/${currentUser.rut_persona}`, currentUser);
             setSuccessMessage('Usuario actualizado correctamente');
             setUsuarios(usuarios.map(user => user.rut_persona === currentUser.rut_persona ? currentUser : user));
             handleCloseModal();
@@ -102,7 +102,7 @@ const AdminPanel = () => {
 
     const handleCreateUser = async () => {
         try {
-            await api.post('/create_client', currentUser);
+            await userApi.post('/create_client', currentUser);
             setSuccessMessage('Usuario creado correctamente');
             setUsuarios([...usuarios, currentUser]);
             handleCloseModal();

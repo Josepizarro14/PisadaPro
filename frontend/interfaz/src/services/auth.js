@@ -1,9 +1,9 @@
 // auth.js
-import api from '../services/api';
+import { userApi } from '../services/api';  // Importar la instancia de Axios como exportación nombrada
 
 export const handleLogout = async (logout, navigate) => {
     try {
-        const response = await api.post('/logout');
+        const response = await userApi.post('/logout');
         if (response.status === 200) {
             console.log('Logout exitoso en el backend.');
 

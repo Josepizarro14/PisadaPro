@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../services/api';
+import { userApi } from '../services/api';  // Importar la instancia de Axios como exportación nombrada
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -16,7 +16,7 @@ const Login = () => {
         setError(''); // Limpiar mensaje de error al intentar nuevamente
         try {
             // Agrega { withCredentials: true } para enviar cookies
-            const response = await api.post('/login', { email, password }, { withCredentials: true });
+            const response = await userApi.post('/login', { email, password }, { withCredentials: true });
 
             console.log(response.data); // Verificar la respuesta en la consola
 
