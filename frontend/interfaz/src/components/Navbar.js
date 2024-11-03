@@ -56,9 +56,6 @@ const Navbar = () => {
                         </li>
                     </ul>
                     <ul className="navbar-nav ms-auto">
-                        <li className="nav-item">
-                        <i class="fa-solid fa-cart-shopping nav-link" className="fa-solid fa-cart-shopping" style={{ cursor: 'pointer' }} onClick={toggleCartModal}></i>
-                        </li>
                         
                         {isAuthenticated ? (
                             <li className="nav-item dropdown">
@@ -76,6 +73,13 @@ const Navbar = () => {
                                         <li>
                                             <Link className="dropdown-item" to="/admin-panel">Panel de control</Link>
                                         </li>
+                                        
+                                    )}
+                                    {userRole === 'administrador' && (
+                                        <li>
+                                            <Link className="dropdown-item" to="/product-manager">Control de inventario</Link>
+                                        </li>
+                                        
                                     )}
                                     <li>
                                         <hr className="dropdown-divider" />

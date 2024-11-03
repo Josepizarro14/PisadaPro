@@ -32,7 +32,7 @@ services:
     build: ./product-service
     volumes:
       - ./product-service:/app
-    command: node app/app.js
+    command: npx nodemon --legacy-watch app/server.js
     ports:
       - "5001:5001"
     environment:
