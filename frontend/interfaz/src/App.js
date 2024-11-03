@@ -11,6 +11,10 @@ import NotFound from './pages/NotFound';
 import Register from './components/Register';
 import AdminPanel from './pages/AdminPanel'; // Importamos el nuevo componente
 import ProductManager from './components/ProductManager';
+import Hombre from './pages/Hombre';
+import Mujer from './pages/Mujer';
+import Nino from './pages/Nino';
+import Todos from './pages/Todos';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import UpdateAccount from './components/UpdateAccount';
@@ -29,6 +33,10 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/admin-panel" element={<AdminPanel />} />
                         <Route path="/update-account" element={<UpdateAccount />} />
+                        <Route path="/category/hombre" element={<Hombre />} />
+                        <Route path="/category/mujer" element={<Mujer />} />
+                        <Route path="/category/nino" element={<Nino />} />
+                        <Route path="/category/todos" element={<Todos />} />
                         <Route path='/product-manager' element={<ProductManager />} />
                         <Route path="*" element={<NotFound />} />
                         {/* Agrega más rutas aquí */}

@@ -13,6 +13,13 @@ const productApi = axios.create({
   withCredentials: true,
 });
 
+// Instancia para el microservicio de productos
+const catalogApi = axios.create({
+  baseURL: 'http://localhost:5002', // URL del microservicio de catalogo
+  withCredentials: true,
+});
+
+
 // Usar Axios en lugar de fetch para la función de login
 export const login = async (email, password) => {
     const response = await userApi.post('/login', { email, password }); // Usar la instancia de Axios
@@ -36,5 +43,28 @@ export const createProduct = async (productData) => {
     return response.data;
 };
 
+// Función para obtener productos por categoría
+export const getProductsByCategory = async (category) => {
+  try {
+      const response = await catalogApi.get(`/products/category/${category}`);
+      return response.data;
+  } catch (error) {
+      console.error('Error al obtener productos por categoría:', error);
+      throw error;
+  }
+};
+
+// Función para obtener todos los productos
+export const getAllProducts = async () => {
+  try {
+      const response = await catalogApi.get('/products/all');
+      return response.data;
+  } catch (error) {
+      console.error('Error al obtener todos los productos:', error);
+      throw error;
+  }
+};
+
+
 // Exportar las instancias para ser utilizadas en otros archivos
-export { userApi, productApi };
+export { userApi, productApi, catalogApi };

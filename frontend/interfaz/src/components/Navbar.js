@@ -9,10 +9,9 @@ const Navbar = () => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     const userRole = localStorage.getItem('userRole');
     const navigate = useNavigate();
-    const [showCart, setShowCart] = useState(false); // Estado para mostrar/ocultar el modal del carrito
+    const [showCart, setShowCart] = useState(false);
 
     const handleLogout = async () => {
-        const isAuthenticated = localStorage.getItem('isAuthenticated');
         if (isAuthenticated) {
             try {
                 const response = await userApi.post('/logout');
@@ -33,7 +32,7 @@ const Navbar = () => {
     };
 
     const toggleCartModal = () => {
-        setShowCart(!showCart); // Cambiar el estado para mostrar/ocultar el modal
+        setShowCart(!showCart);
     };
 
     return (
@@ -45,18 +44,22 @@ const Navbar = () => {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav me-auto">
+
+                        {/* Categorías de zapatillas */}
                         <li className="nav-item">
-                            <Link className="nav-link" to="/">Inicio</Link>
+                            <Link className="nav-link" to="/category/todos">Explorar Todas las Zapatillas</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/about">Nosotros</Link>
+                            <Link className="nav-link" to="/category/mujer">Mujer</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/contact">Contacto</Link>
+                             <Link className="nav-link" to="/category/hombre">Hombre</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/category/nino">Niño</Link>
                         </li>
                     </ul>
                     <ul className="navbar-nav ms-auto">
-                        
                         {isAuthenticated ? (
                             <li className="nav-item dropdown">
                                 <span className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -70,16 +73,14 @@ const Navbar = () => {
                                         <Link className="dropdown-item" to="/order-history">Historial de pedidos</Link>
                                     </li>
                                     {userRole === 'administrador' && (
-                                        <li>
-                                            <Link className="dropdown-item" to="/admin-panel">Panel de control</Link>
-                                        </li>
-                                        
-                                    )}
-                                    {userRole === 'administrador' && (
-                                        <li>
-                                            <Link className="dropdown-item" to="/product-manager">Control de inventario</Link>
-                                        </li>
-                                        
+                                        <>
+                                            <li>
+                                                <Link className="dropdown-item" to="/admin-panel">Panel de control</Link>
+                                            </li>
+                                            <li>
+                                                <Link className="dropdown-item" to="/product-manager">Control de inventario</Link>
+                                            </li>
+                                        </>
                                     )}
                                     <li>
                                         <hr className="dropdown-divider" />

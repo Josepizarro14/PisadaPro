@@ -103,5 +103,37 @@ app.get('/ping', (req, res) => {
     res.send('pong');
 });
 
+// Endpoint para obtener productos por categoría
+app.get('/products/category/:category', async (req, res) => {
+    const { category } = req.params;
+    try {
+        const products = await Product.find({ categoria: category });
+        res.send(products);
+    } catch (error) {
+        res.status(500).send({ error: 'Error al obtener productos: ' + error.message });
+    }
+});
+
+// Endpoint para obtener todas las zapatillas
+app.get('/products/all', async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.send(products);
+    } catch (error) {
+        res.status(500).send({ error: 'Error al obtener todos los productos: ' + error.message });
+    }
+});
+
+
+// Endpoint para obtener 6 productos aleatorios
+app.get('/products/random', async (req, res) => {
+    try {
+        const products = await Product.aggregate([{ $sample: { size: 4 } }]); // Obtiene 6 productos aleatorios
+        res.send(products);
+    } catch (error) {
+        res.status(500).send({ error: 'Error al obtener productos aleatorios: ' + error.message });
+    }
+});
+
 
 module.exports = app; // Añadir esta línea

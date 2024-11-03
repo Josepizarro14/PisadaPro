@@ -1,17 +1,42 @@
-// src/pages/Home.js
-import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Asegúrate de importar Bootstrap
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/styles.css';
 
+const catalogApi = axios.create({
+    baseURL: 'http://localhost:5002', // URL del microservicio de catálogo
+    withCredentials: true,
+});
 
 const Home = () => {
+    const [products, setProducts] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
+    useEffect(() => {
+        const fetchRandomProducts = async () => {
+            try {
+                const response = await catalogApi.get('/products/random');
+                setProducts(response.data);
+            } catch (error) {
+                console.error('Error al obtener productos aleatorios:', error);
+            }
+        };
+
+        fetchRandomProducts();
+    }, []);
+
+    // Abrir el modal con detalles del producto seleccionado
+    const handleShowDetails = (product) => {
+        setSelectedProduct(product);
+    };
+
+    // Cerrar el modal
+    const handleClose = () => {
+        setSelectedProduct(null);
+    };
+
     return (
         <div>
-
-            {/*<div className="container mt-5 text-center">
-                <p>Explora nuestra variedad de zapatillas y disfruta de una experiencia de compra única.</p>
-            </div>
-            */}
             {/* Carrusel */}
             <div id="carouselExampleIndicators" className="carousel slide" data-bs-ride="carousel">
                 <div className="carousel-indicators">
@@ -40,83 +65,56 @@ const Home = () => {
                 </button>
             </div>
 
-
-
-
-            {/* Productos destacados en tres columnas */}
-            <div className="container mt-2">
+            {/* Productos destacados en filas */}
+            <div className="container mt-4">
                 <div className="row">
-                    <div className="col-sm-2">
-                        <div className="card h-100 card2">
-                            <img src="/assets/images/imagen1.jpg" className="card-img-top card2-img-top" alt="Zapatilla 1" />
-                            <div className="card-body text-center card2-body">
-                                <h5 className="card-title card2-title">Zapatilla 1</h5>
-                                <p className="card-text card2-text">Descripción breve.</p>
-                                <a href="#" className="btn btn-primary">Ver detalles</a>
+                    {products.map((product) => (
+                        <div className="col-6 col-md-4 col-lg-3 mb-4" key={product._id}> {/* Ajuste de clases para el tamaño de columnas */}
+                            <div className="card h-100">
+                                <img src={product.imagen} className="card-img-top" alt={product.nombre} />
+                                <div className="card-body text-center">
+                                    <h5 className="card-title">{product.nombre}</h5>
+                                    <p className="card-text">{product.descripcion}</p>
+                                    <p className="card-text"><strong>${product.precio}</strong></p>
+                                    <p className="card-text">Stock: {product.stock}</p> {/* Mostrar stock */}
+                                    <button className="btn btn-primary" onClick={() => handleShowDetails(product)}>Ver detalles</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="col-sm-2">
-                        <div className="card h-100 card2">
-                            <img src="/assets/images/imagen2.jpg" className="card-img-top card2-img-top" alt="Zapatilla 2" />
-                            <div className="card-body text-center card2-body">
-                                <h5 className="card-title card2-title">Zapatilla 2</h5>
-                                <p className="card-text card2-text">Descripción breve.</p>
-                                <a href="#" className="btn btn-primary">Ver detalles</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-sm-2">
-                        <div className="card h-100 card2">
-                            <img src="/assets/images/imagen3.jpg" className="card-img-top card2-img-top" alt="Zapatilla 3" />
-                            <div className="card-body text-center card2-body">
-                                <h5 className="card-title card2-title">Zapatilla 3</h5>
-                                <p className="card-text card2-text">Descripción breve.</p>
-                                <a href="#" className="btn btn-primary">Ver detalles</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-sm-2">
-                        <div className="card h-100 card2">
-                            <img src="/assets/images/imagen4.jpg" className="card-img-top card2-img-top" alt="Zapatilla 4" />
-                            <div className="card-body text-center card2-body">
-                                <h5 className="card-title card2-title">Zapatilla 4</h5>
-                                <p className="card-text card2-text">Descripción breve.</p>
-                                <a href="#" className="btn btn-primary">Ver detalles</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-sm-2">
-                        <div className="card h-100 card2">
-                            <img src="/assets/images/imagen5.jpg" className="card-img-top card2-img-top" alt="Zapatilla 5" />
-                            <div className="card-body text-center card2-body">
-                                <h5 className="card-title card2-title">Zapatilla 5</h5>
-                                <p className="card-text card2-text">Descripción breve.</p>
-                                <a href="#" className="btn btn-primary">Ver detalles</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-sm-2">
-                        <div className="card h-100 card2">
-                            <img src="/assets/images/imagen6.jpg" className="card-img-top card2-img-top" alt="Zapatilla 6" />
-                            <div className="card-body text-center card2-body">
-                                <h5 className="card-title card2-title">Zapatilla 6</h5>
-                                <p className="card-text card2-text">Descripción breve.</p>
-                                <a href="#" className="btn btn-primary">Ver detalles</a>
-                            </div>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div>
-
-
-
 
             {/* Banner */}
             <div className="banner mt-4" style={{ backgroundImage: "url('../assets/images/banner.jpg')", backgroundSize: 'cover', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', textAlign: 'center' }}>
                 <h1 style={{ fontSize: '3rem', fontWeight: 'bold' }}>Bienvenido a PisadaPro</h1>
             </div>
 
+            {/* Modal para detalles del producto */}
+            {selectedProduct && (
+                <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">{selectedProduct.nombre}</h5>
+                                <button type="button" className="close" onClick={handleClose}>
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                <img src={selectedProduct.imagen} className="img-fluid mb-3" alt={selectedProduct.nombre} />
+                                <p>{selectedProduct.descripcion}</p>
+                                <p className="fw-bold">${selectedProduct.precio}</p>
+                                <p className="fw-bold">Stock: {selectedProduct.stock}</p> {/* Mostrar stock en el modal */}
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={handleClose}>Cerrar</button>
+                                <button type="button" className="btn btn-primary">Agregar al carrito</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
