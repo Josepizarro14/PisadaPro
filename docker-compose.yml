@@ -55,7 +55,7 @@ services:
     build: ./catalog-service
     volumes:
       - ./catalog-service:/app
-    command: node app/app.js
+    command: npx nodemon --legacy-watch app/server.js
     ports:
       - "5002:5002"
     environment:
