@@ -59,7 +59,7 @@ services:
     ports:
       - "5002:5002"
     environment:
-      MONGO_URL: "mongodb://catalog-db:27018/pisadapro_catalogs"
+      MONGO_URL: "mongodb://catalog-db:27017/pisadapro_catalogs"
       RABBITMQ_URL: "amqp://rabbitmq:5672"
     depends_on:
       - catalog-db

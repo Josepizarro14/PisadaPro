@@ -1,5 +1,5 @@
 {
-  "name": "product-service",
+  "name": "catalog-service",
   "version": "1.0.0",
   "main": "App.js",
   "scripts": {
