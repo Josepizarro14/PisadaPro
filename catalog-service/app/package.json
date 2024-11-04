@@ -10,5 +10,10 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.0"
+  },
+  "script":
+  {
+    "start": "node index.js",
+    "start-watch": "WATCHPACK_POLLING=true react-scripts start"
   }
 }

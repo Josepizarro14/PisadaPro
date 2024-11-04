@@ -4,3 +4,4 @@ Flask-SQLAlchemy>=2.5.1
 psycopg2==2.9.1
 Flask-Login
 flask-cors
+blueprint
