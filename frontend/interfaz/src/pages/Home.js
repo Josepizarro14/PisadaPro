@@ -25,12 +25,10 @@ const Home = () => {
         fetchRandomProducts();
     }, []);
 
-    // Abrir el modal con detalles del producto seleccionado
     const handleShowDetails = (product) => {
         setSelectedProduct(product);
     };
 
-    // Cerrar el modal
     const handleClose = () => {
         setSelectedProduct(null);
     };
@@ -38,7 +36,7 @@ const Home = () => {
     return (
         <div>
             {/* Carrusel */}
-            <div id="carouselExampleIndicators" className="carousel slide" data-bs-ride="carousel">
+            <div id="carouselExampleIndicators" className="carousel slide mb-4" data-bs-ride="carousel">
                 <div className="carousel-indicators">
                     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" className="active" aria-current="true" aria-label="Slide 1"></button>
                     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -47,12 +45,15 @@ const Home = () => {
                 <div className="carousel-inner">
                     <div className="carousel-item active">
                         <img src="/assets/images/slide1.jpg" className="d-block w-100" alt="Zapatilla 1" />
+                        
                     </div>
                     <div className="carousel-item">
                         <img src="/assets/images/slide2.jpg" className="d-block w-100" alt="Zapatilla 2" />
+                        
                     </div>
                     <div className="carousel-item">
                         <img src="/assets/images/slide3.jpg" className="d-block w-100" alt="Zapatilla 3" />
+                        
                     </div>
                 </div>
                 <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -66,18 +67,20 @@ const Home = () => {
             </div>
 
             {/* Productos destacados en filas */}
-            <div className="container mt-4">
+            <div className="container">
+                <h2 className="text-center mb-3">Productos Destacados</h2>
                 <div className="row">
                     {products.map((product) => (
-                        <div className="col-6 col-md-4 col-lg-3 mb-4" key={product._id}> {/* Ajuste de clases para el tamaño de columnas */}
-                            <div className="card h-100">
+                        <div className="col-6 col-md-4 col-lg-3 mb-4" key={product._id}>
+                            <div className="card h-100 shadow-sm border-0">
                                 <img src={product.imagen} className="card-img-top" alt={product.nombre} />
                                 <div className="card-body text-center">
-                                    <h5 className="card-title">{product.nombre}</h5>
-                                    <p className="card-text">{product.descripcion}</p>
-                                    <p className="card-text"><strong>${product.precio}</strong></p>
-                                    <p className="card-text">Stock: {product.stock}</p> {/* Mostrar stock */}
-                                    <button className="btn btn-primary" onClick={() => handleShowDetails(product)}>Ver detalles</button>
+                                    <h5 className="card-title font-weight-bold">{product.nombre}</h5>
+                                    <p className="text-muted small">{product.descripcion}</p>
+                                    <p className="text-primary fw-bold">${product.precio}</p>
+                                    <button className="btn btn-dark btn-sm mt-2" onClick={() => handleShowDetails(product)}>
+                                        Ver detalles
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -86,30 +89,36 @@ const Home = () => {
             </div>
 
             {/* Banner */}
-            <div className="banner mt-4" style={{ backgroundImage: "url('../assets/images/banner.jpg')", backgroundSize: 'cover', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '3rem', fontWeight: 'bold' }}>Bienvenido a PisadaPro</h1>
+            <div className="banner mt-4 mb-4 p-5 text-center" style={{ backgroundImage: "url('../assets/images/banner.jpg')", backgroundSize: 'cover', color: 'white', borderRadius: '8px' }}>
+                <h1 className="display-4 fw-bold">Bienvenido a PisadaPro</h1>
+                <p className="lead">Encuentra el calzado perfecto para tu estilo y comodidad</p>
+                <button className="btn btn-outline-light btn-lg mt-3">Ver colecciones</button>
             </div>
 
             {/* Modal para detalles del producto */}
             {selectedProduct && (
                 <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
-                    <div className="modal-dialog" role="document">
+                    <div className="modal-dialog modal-lg" role="document">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">{selectedProduct.nombre}</h5>
-                                <button type="button" className="close" onClick={handleClose}>
-                                    <span>&times;</span>
-                                </button>
+                                <button type="button" className="btn-close" onClick={handleClose}></button>
                             </div>
                             <div className="modal-body">
-                                <img src={selectedProduct.imagen} className="img-fluid mb-3" alt={selectedProduct.nombre} />
-                                <p>{selectedProduct.descripcion}</p>
-                                <p className="fw-bold">${selectedProduct.precio}</p>
-                                <p className="fw-bold">Stock: {selectedProduct.stock}</p> {/* Mostrar stock en el modal */}
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <img src={selectedProduct.imagen} className="img-fluid" alt={selectedProduct.nombre} />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <p className="text-muted">{selectedProduct.descripcion}</p>
+                                        <p className="text-primary fw-bold">${selectedProduct.precio}</p>
+                                        <p className="fw-bold">Stock: {selectedProduct.stock}</p>
+                                        <button className="btn btn-primary btn-lg mt-3">Agregar al carrito</button>
+                                    </div>
+                                </div>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={handleClose}>Cerrar</button>
-                                <button type="button" className="btn btn-primary">Agregar al carrito</button>
                             </div>
                         </div>
                     </div>
