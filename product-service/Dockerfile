@@ -1,17 +1,17 @@
+# Dockerfile para el microservicio de productos
 FROM node:18
 
+# Crear y establecer el directorio de trabajo
 WORKDIR /app
 
-COPY app/package.json app/package-lock.json ./
+# Copiar package.json y package-lock.json
+COPY app/package*.json ./
 
-
-COPY . .
-
+# Instalar dependencias
 RUN npm install
 
-# Habilitar polling para cambios en archivos
-ENV WATCHPACK_POLLING=true
+# Copiar el resto del código
+COPY . .
 
-# Exponer el puerto y arrancar la aplicación
-EXPOSE 3000
-CMD ["npm", "run", "start-watch"]
+# Comando para ejecutar el servidor con nodemon
+CMD ["npx", "nodemon", "--legacy-watch", "server.js"]

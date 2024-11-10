@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { userApi } from '../services/api';  // Importar la instancia de Axios como exportación nombrada
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { handleLogout } from '../services/auth';
@@ -26,7 +26,7 @@ const UpdateAccount = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await api.get('/user');
+                const response = await userApi.get('/user');
                 setUserData(response.data);
                 setOriginalEmail(response.data.email);
             } catch (error) {
@@ -46,7 +46,7 @@ const UpdateAccount = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await api.put('/edit_profile', userData); // Actualiza el perfil
+            const response = await userApi.put('/edit_profile', userData); // Actualiza el perfil
     
             // Verificar si el correo electrónico ha cambiado
             if (userData.email !== originalEmail) {

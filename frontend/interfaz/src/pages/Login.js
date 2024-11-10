@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../services/api';
+import { userApi } from '../services/api';  // Importar la instancia de Axios como exportación nombrada
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -13,24 +13,14 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         setSuccessMessage('');
-        setError(''); // Limpiar mensaje de error al intentar nuevamente
+        setError('');
         try {
-            // Agrega { withCredentials: true } para enviar cookies
-            const response = await api.post('/login', { email, password }, { withCredentials: true });
-
-            console.log(response.data); // Verificar la respuesta en la consola
-
-            // Verificar si el inicio de sesión fue exitoso
+            const response = await userApi.post('/login', { email, password }, { withCredentials: true });
             if (response.data.message === 'Inicio de sesión exitoso.') {
-                // Almacena información del usuario en localStorage
                 localStorage.setItem('userRole', response.data.role);
                 localStorage.setItem('userName', response.data.nombre);
                 localStorage.setItem('isAuthenticated', true);
-
-                console.log('Inicio de sesión exitoso');
                 setSuccessMessage('Has iniciado sesión exitosamente.');
-
-                // Redirigir después de 2 segundos
                 setTimeout(() => {
                     navigate('/');
                 }, 2000);
@@ -38,7 +28,6 @@ const Login = () => {
                 setError('Credenciales inválidas. Por favor, inténtalo de nuevo.');
             }
         } catch (error) {
-            console.error(error);
             if (error.response && error.response.status === 401) {
                 setError('Credenciales inválidas. Por favor, inténtalo de nuevo.');
             } else {
@@ -48,57 +37,48 @@ const Login = () => {
     };
 
     return (
-        <div className="container mt-5 ">
-            <h2 className="text-center">Iniciar Sesión</h2>
+        <div className="container mt-5 text-center">
+            <h2 className="text-center text-dark">Iniciar Sesión</h2>
             <div className="row justify-content-center mt-4">
-
-
-
                 <div className="col-md-6">
-
-                    {/* Mostrar mensaje de éxito */}
                     {successMessage && (
                         <div className="alert alert-success" role="alert">
                             {successMessage}
                         </div>
                     )}
-
-                    {/* Mostrar mensaje de error */}
                     {error && (
                         <div className="alert alert-danger" role="alert">
                             {error}
                         </div>
                     )}
-
-                    <form onSubmit={handleLogin} className="border p-4 rounded shadow">
+                    <form onSubmit={handleLogin} className="border p-4 rounded shadow bg-light">
                         <div className="mb-3">
-                            <label htmlFor="email" className="form-label">Email</label>
+                            <label htmlFor="email" className="form-label text-dark">Email</label>
                             <input
                                 type="email"
                                 id="email"
-                                className="form-control"
+                                className="form-control border-dark"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Ingresa tu email"
                                 required
+                                style={{ backgroundColor: '#f9f9f9', color: '#333' }}
                             />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="password" className="form-label">Contraseña</label>
+                            <label htmlFor="password" className="form-label text-dark">Contraseña</label>
                             <input
                                 type="password"
                                 id="password"
-                                className="form-control"
+                                className="form-control border-dark"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Ingresa tu contraseña"
                                 required
+                                style={{ backgroundColor: '#f9f9f9', color: '#333' }}
                             />
                         </div>
-
-
-
-                        <button type="submit" className="btn btn-primary w-100">Iniciar Sesión</button>
+                        <button type="submit" className="btn btn-dark w-100">Iniciar Sesión</button>
                     </form>
                 </div>
             </div>

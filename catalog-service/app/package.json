@@ -1,7 +1,7 @@
 {
   "name": "catalog-service",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "App.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -9,11 +9,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.0"
+    "amqplib": "^0.10.4",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.8.0"
   },
-  "script":
-  {
-    "start": "node index.js",
-    "start-watch": "WATCHPACK_POLLING=true react-scripts start"
+  "script": {
+    "start": "node app.js",
+    "start-dev": "nodemon --legacy-watch app.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }

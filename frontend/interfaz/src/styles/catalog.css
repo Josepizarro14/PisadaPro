@@ -1,0 +1,91 @@
+/* Estilos generales del contenedor */
+.container {
+    max-width: 1200px; /* Ancho máximo para mantener la alineación */
+    margin: 0 auto; /* Centramos el contenedor */
+    padding: 20px; /* Espaciado interno */
+}
+
+/* Estilo de las tarjetas de productos */
+.card {
+    border: none; /* Sin borde */
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    transition: transform 0.3s, box-shadow 0.3s; /* Animación de hover */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Elevar la tarjeta en hover */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada en hover */
+}
+
+/* Estilo de las imágenes de los productos */
+.card-img-top {
+    border-top-left-radius: 15px; /* Esquinas redondeadas superiores */
+    border-top-right-radius: 15px; /* Esquinas redondeadas superiores */
+    height: 200px; /* Altura fija para las imágenes */
+    object-fit: cover; /* Cubrir el área sin deformar */
+}
+
+/* Títulos de las tarjetas */
+.card-title {
+    font-size: 1.25rem; /* Tamaño de fuente más grande */
+    color: #333; /* Color del texto */
+    font-weight: 600; /* Peso del texto */
+}
+
+/* Texto de descripción */
+.card-text {
+    color: #666; /* Color gris para el texto */
+    font-size: 0.9rem; /* Tamaño de fuente */
+}
+
+/* Precio de los productos */
+.card-text.fw-bold {
+    color: #007bff; /* Color azul para el precio */
+    font-size: 1.1rem; /* Tamaño de fuente ligeramente más grande */
+}
+
+/* Estilo de los botones */
+.btn {
+    border-radius: 30px; /* Bordes redondeados para los botones */
+    padding: 10px 20px; /* Espaciado interno */
+    font-size: 1rem; /* Tamaño de fuente */
+    transition: background-color 0.3s, color 0.3s; /* Transiciones para hover */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Color de fondo */
+    color: white; /* Color del texto */
+}
+
+.btn-outline-primary {
+    background-color: transparent; /* Fondo transparente */
+    color: #007bff; /* Color del texto */
+    border: 2px solid #007bff; /* Borde azul */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Color más oscuro en hover */
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff; /* Fondo azul al hacer hover */
+    color: white; /* Color del texto */
+}
+
+/* Estilos de la paginación */
+.pagination {
+    margin: 20px 0; /* Margen superior e inferior */
+}
+
+.pagination .btn {
+    margin: 0 5px; /* Espaciado entre botones de paginación */
+}
+
+/* Estilos del encabezado */
+h2 {
+    font-size: 2rem; /* Tamaño de fuente del encabezado */
+    color: #333; /* Color del texto */
+    margin-bottom: 20px; /* Margen inferior */
+    font-weight: bold; /* Peso del texto */
+}

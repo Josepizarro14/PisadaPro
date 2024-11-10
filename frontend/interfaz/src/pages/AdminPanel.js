@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api';  // Asegúrate de que esto esté correctamente configurado
+import { useNavigate, Link } from 'react-router-dom'; // Asegúrate de importar Link
+import { userApi } from '../services/api';
 import { Modal } from 'react-bootstrap';
 
 const AdminPanel = () => {
@@ -41,7 +40,7 @@ const AdminPanel = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await api.get('/admin');
+                const response = await userApi.get('/admin');
                 setUsuarios(response.data);
             } catch (error) {
                 setError('Error al cargar los usuarios');
@@ -53,7 +52,7 @@ const AdminPanel = () => {
 
     const eliminarUsuario = async (email) => {
         try {
-            await api.delete(`/delete_client/${email}`);
+            await userApi.delete(`/delete_client/${email}`);
             setSuccessMessage('Usuario eliminado correctamente');
             setUsuarios(usuarios.filter(user => user.email !== email));
         } catch (error) {
@@ -90,8 +89,7 @@ const AdminPanel = () => {
 
     const handleEditUser = async () => {
         try {
-            // Actualiza el usuario, utilizando el correo actual
-            await api.put(`/edit_client/${currentUser.rut_persona}`, currentUser);
+            await userApi.put(`/edit_client/${currentUser.rut_persona}`, currentUser);
             setSuccessMessage('Usuario actualizado correctamente');
             setUsuarios(usuarios.map(user => user.rut_persona === currentUser.rut_persona ? currentUser : user));
             handleCloseModal();
@@ -102,7 +100,7 @@ const AdminPanel = () => {
 
     const handleCreateUser = async () => {
         try {
-            await api.post('/create_client', currentUser);
+            await userApi.post('/create_client', currentUser);
             setSuccessMessage('Usuario creado correctamente');
             setUsuarios([...usuarios, currentUser]);
             handleCloseModal();
@@ -117,8 +115,6 @@ const AdminPanel = () => {
             <p className="text-center">Aquí puedes gestionar productos, usuarios y más.</p>
             {error && <div className="alert alert-danger">{error}</div>}
             {successMessage && <div className="alert alert-success">{successMessage}</div>}
-
-
 
             <table className="table table-striped table-hover">
                 <thead className="thead-dark">
@@ -157,6 +153,8 @@ const AdminPanel = () => {
             </table>
             {/* Botón para crear un nuevo usuario */}
             <button className="btn btn-primary mb-3" onClick={() => handleShowModal()}>Crear Nuevo Usuario</button>
+            {/* Botón para Control de Inventario */}
+            <Link className="btn btn-secondary mb-3 ms-2" to="/product-manager">Control de inventario</Link>
             {/* Modal para crear/editar usuario */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
@@ -173,7 +171,7 @@ const AdminPanel = () => {
                                     id="rut_persona"
                                     value={currentUser.rut_persona}
                                     onChange={(e) => setCurrentUser({ ...currentUser, rut_persona: e.target.value })}
-                                    disabled={isEditing}  // Aquí estamos bloqueando el campo si se está editando
+                                    disabled={isEditing}
                                 />
                             </div>
 
@@ -240,7 +238,6 @@ const AdminPanel = () => {
                                 />
                             </div>
 
-
                             <div className="col-md-6 mb-3">
                                 <label htmlFor="telefono" className="form-label">Teléfono</label>
                                 <input
@@ -251,16 +248,19 @@ const AdminPanel = () => {
                                     onChange={(e) => setCurrentUser({ ...currentUser, telefono: e.target.value })}
                                 />
                             </div>
-                            <div className="col-md-6 mb-3">
-                                <label htmlFor="contrasena" className="form-label">Contraseña</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    id="contrasena"
-                                    value={currentUser.contrasena}
-                                    onChange={(e) => setCurrentUser({ ...currentUser, contrasena: e.target.value })}
-                                />
-                            </div>
+                            {/* Solo mostrar el campo de contraseña al crear un nuevo usuario */}
+                            {!isEditing && (
+                                <div className="col-md-6 mb-3">
+                                    <label htmlFor="contrasena" className="form-label">Contraseña</label>
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        id="contrasena"
+                                        value={currentUser.contrasena}
+                                        onChange={(e) => setCurrentUser({ ...currentUser, contrasena: e.target.value })}
+                                    />
+                                </div>
+                            )}
                             <div className="col-md-6 mb-3">
                                 <label htmlFor="rol" className="form-label">Rol</label>
                                 <select
@@ -269,19 +269,21 @@ const AdminPanel = () => {
                                     value={currentUser.rol}
                                     onChange={(e) => setCurrentUser({ ...currentUser, rol: e.target.value })}
                                 >
-                                    <option value="">Selecciona un rol</option>
-                                    <option value="cliente">Cliente</option>
+                                    <option value="">Seleccionar rol</option>
                                     <option value="administrador">Administrador</option>
+                                    <option value="usuario">Usuario</option>
                                 </select>
                             </div>
                         </div>
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <button className="btn btn-secondary" onClick={handleCloseModal}>Cancelar</button>
-                    <button className="btn btn-primary" onClick={isEditing ? handleEditUser : handleCreateUser}>
-                        {isEditing ? 'Guardar Cambios' : 'Crear Usuario'}
-                    </button>
+                    <button className="btn btn-secondary" onClick={handleCloseModal}>Cerrar</button>
+                    {isEditing ? (
+                        <button className="btn btn-primary" onClick={handleEditUser}>Guardar Cambios</button>
+                    ) : (
+                        <button className="btn btn-primary" onClick={handleCreateUser}>Crear Usuario</button>
+                    )}
                 </Modal.Footer>
             </Modal>
         </div>

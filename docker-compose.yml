@@ -32,7 +32,7 @@ services:
     build: ./product-service
     volumes:
       - ./product-service:/app
-    command: node app/app.js
+    command: npx nodemon --legacy-watch app/server.js
     ports:
       - "5001:5001"
     environment:
@@ -55,11 +55,11 @@ services:
     build: ./catalog-service
     volumes:
       - ./catalog-service:/app
-    command: node app/app.js
+    command: npx nodemon --legacy-watch app/server.js
     ports:
       - "5002:5002"
     environment:
-      MONGO_URL: "mongodb://catalog-db:27018/pisadapro_catalogs"
+      MONGO_URL: "mongodb://catalog-db:27017/pisadapro_catalogs"
       RABBITMQ_URL: "amqp://rabbitmq:5672"
     depends_on:
       - catalog-db

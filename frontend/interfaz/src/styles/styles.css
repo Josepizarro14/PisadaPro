@@ -33,62 +33,57 @@ body {
 
 /* Navbar.css */
 .navbar {
-    background-color: #f8f9fa;
-    /* Color de fondo */
+    background-color: #ffffff; /* Fondo blanco */
     padding: 0;
-    /* Elimina el padding para que el hover ocupe todo el navbar */
 }
 
 .navbar-brand {
     font-size: 1.5rem;
-    /* Tamaño de la letra de la marca */
+    color: black; /* Texto negro */
     font-weight: bold;
-    /* Negrita para la marca */
     padding: 1rem;
-    /* Espaciado interno para la marca */
+    transition: color 0.3s;
+}
+
+.navbar-brand:hover {
+    color: gray; /* Suave cambio de color al pasar el mouse */
 }
 
 .navbar-nav {
     display: flex;
-    /* Usar flexbox para la distribución */
     align-items: center;
-    /* Centrar verticalmente los elementos */
+}
+
+.navbar .nav-item .nav-link {
+    color: black; /* Texto negro por defecto */
+    transition: color 0.3s, background-color 0.3s;
 }
 
 .navbar .nav-item .nav-link:hover {
-    background-color: black;
-    color: white !important;
-    /* Forzar que el color del texto sea blanco */
+    background-color: black; /* Fondo negro al pasar el mouse */
+    color: white !important; /* Texto blanco en hover */
+    border-radius: 0.25rem; /* Bordes ligeramente redondeados */
 }
-
 
 .dropdown-item {
     font-size: 1rem;
-    /* Tamaño de la letra de los elementos del dropdown */
+    color: black;
     transition: background-color 0.3s, color 0.3s;
-    /* Suavizar la transición del hover */
 }
 
 .dropdown-item:hover {
-    background-color: black;
-    /* Color de fondo al hacer hover en el dropdown */
-    color: white;
-    /* Color del texto al hacer hover en el dropdown */
+    background-color: black; /* Fondo negro en hover */
+    color: white; /* Texto blanco en hover */
 }
 
 .navbar-toggler {
     border: none;
-    /* Quitar borde del botón de hamburguesa */
 }
 
-/* Cambiar color de los enlaces al pasar el mouse */
 .navbar-toggler:hover {
-    background-color: black;
-    /* Color de fondo del botón de hamburguesa al hacer hover */
-    border-radius: 0.25rem;
-    /* Bordes redondeados para el botón de hamburguesa */
+    background-color: black; /* Fondo negro en hover */
     color: white;
-    /* Color del texto al hacer hover */
+    border-radius: 0.25rem;
 }
 
 /* Ajustar el tamaño de las tarjetas */
