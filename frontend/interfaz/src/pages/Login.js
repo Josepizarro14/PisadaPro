@@ -20,6 +20,7 @@ const Login = () => {
                 localStorage.setItem('userRole', response.data.role);
                 localStorage.setItem('userName', response.data.nombre);
                 localStorage.setItem('isAuthenticated', true);
+                localStorage.setItem('authToken', response.data.token);
                 setSuccessMessage('Has iniciado sesión exitosamente.');
                 setTimeout(() => {
                     navigate('/');
