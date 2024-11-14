@@ -89,3 +89,24 @@ h2 {
     margin-bottom: 20px; /* Margen inferior */
     font-weight: bold; /* Peso del texto */
 }
+
+.modal-lg .modal-content {
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header .modal-title {
+    font-weight: 700;
+}
+
+.modal-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.modal-footer .btn-primary {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+}

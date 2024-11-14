@@ -99,36 +99,36 @@ const Home = () => {
 
             {/* Modal para detalles del producto */}
             {selectedProduct && (
-                <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
+                <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }} tabIndex="-1" role="dialog">
                     <div className="modal-dialog modal-lg" role="document">
                         <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">{selectedProduct.nombre}</h5>
-                                <button type="button" className="btn-close" onClick={handleClose}></button>
+                            <div className="modal-header border-0">
+                                <h3 className="modal-title text-primary">{selectedProduct.nombre}</h3>
+                                <button type="button" className="btn-close" aria-label="Close" onClick={handleClose}></button>
                             </div>
                             <div className="modal-body">
                                 <div className="row">
                                     <div className="col-md-6">
-                                        <img src={selectedProduct.imagen} className="img-fluid" alt={selectedProduct.nombre} />
+                                        <img src={selectedProduct.imagen} className="img-fluid rounded shadow-sm" alt={selectedProduct.nombre} />
                                     </div>
                                     <div className="col-md-6">
-                                        <p className="text-muted">{selectedProduct.descripcion}</p>
-                                        <p className="text-primary fw-bold">${selectedProduct.precio}</p>
-                                        <p className="fw-bold">Stock: {selectedProduct.stock}</p>
-                                        <button
-                                            className="btn btn-primary btn-lg mt-3"
-                                            onClick={() => {
-                                                addToCart(selectedProduct);
-                                                handleClose();
-                                            }}
-                                        >
-                                            Agregar al carrito
-                                        </button>
+                                        <p className="text-muted mt-3">{selectedProduct.descripcion}</p>
+                                        <h4 className="fw-bold text-success">${selectedProduct.precio}</h4>
+                                        <p className="text-secondary"><strong>Stock disponible:</strong> {selectedProduct.stock}</p>
                                     </div>
                                 </div>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={handleClose}>Cerrar</button>
+                            <div className="modal-footer border-0">
+                                <button type="button" className="btn btn-outline-secondary" onClick={handleClose}>Cerrar</button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        addToCart(selectedProduct);
+                                        handleClose();
+                                    }}
+                                >
+                                    Agregar al carrito
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { getAllProducts } from '../services/api'; // Asegúrate de que la ruta a api.js sea correcta
-import '../styles/catalog.css'; // Personaliza los estilos en este archivo CSS
-import 'bootstrap/dist/css/bootstrap.min.css'; // Asegúrate de tener Bootstrap para usar el modal
+import { getAllProducts } from '../services/api';
+import '../styles/catalog.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { useCart } from '../contexts/CartContext';
-
 
 const Todos = () => {
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const { addToCart } = useCart(); // Usa la función addToCart del contexto
+    const { addToCart } = useCart();
     const productsPerPage = 9;
 
-    // Obtener todos los productos al cargar el componente
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -25,20 +23,16 @@ const Todos = () => {
         fetchProducts();
     }, []);
 
-    // Calcular el índice de los productos para la paginación
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    // Cambiar de página
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    // Abrir el modal con detalles del producto seleccionado
     const handleShowDetails = (product) => {
         setSelectedProduct(product);
     };
 
-    // Cerrar el modal
     const handleClose = () => {
         setSelectedProduct(null);
     };
@@ -55,7 +49,7 @@ const Todos = () => {
                                 <h5 className="card-title">{product.nombre}</h5>
                                 <p className="card-text">{product.descripcion}</p>
                                 <p className="card-text fw-bold">${product.precio}</p>
-                                <p className="card-text">Stock: {product.stock}</p> {/* Mostrar stock */}
+                                <p className="card-text">Stock: {product.stock}</p>
                                 <div className="d-flex justify-content-between">
                                     <button className="btn btn-primary" onClick={() => handleShowDetails(product)}>Ver detalles</button>
                                     <button className="btn btn-secondary" onClick={() => {
@@ -68,7 +62,7 @@ const Todos = () => {
                     </div>
                 ))}
             </div>
-            {/* Paginación */}
+
             <div className="pagination mt-4 d-flex justify-content-center">
                 {[...Array(Math.ceil(products.length / productsPerPage)).keys()].map((number) => (
                     <button
@@ -83,26 +77,29 @@ const Todos = () => {
 
             {/* Modal para detalles del producto */}
             {selectedProduct && (
-                <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
-                    <div className="modal-dialog" role="document">
+                <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }} tabIndex="-1" role="dialog">
+                    <div className="modal-dialog modal-lg" role="document">
                         <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">{selectedProduct.nombre}</h5>
-                                <button type="button" className="close" onClick={handleClose}>
-                                    <span>&times;</span>
-                                </button>
+                            <div className="modal-header border-0">
+                                <h3 className="modal-title text-primary">{selectedProduct.nombre}</h3>
+                                <button type="button" className="btn-close" aria-label="Close" onClick={handleClose}></button>
                             </div>
                             <div className="modal-body">
-                                <img src={selectedProduct.imagen} className="img-fluid mb-3" alt={selectedProduct.nombre} />
-                                <p>{selectedProduct.descripcion}</p>
-                                <p className="fw-bold">${selectedProduct.precio}</p>
-                                <p className="fw-bold">Stock: {selectedProduct.stock}</p> {/* Mostrar stock en el modal */}
-                                {/* Aquí puedes añadir más detalles si lo deseas */}
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <img src={selectedProduct.imagen} className="img-fluid rounded shadow-sm" alt={selectedProduct.nombre} />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <p className="text-muted mt-3">{selectedProduct.descripcion}</p>
+                                        <h4 className="fw-bold text-success">${selectedProduct.precio}</h4>
+                                        <p className="text-secondary"><strong>Stock disponible:</strong> {selectedProduct.stock}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={handleClose}>Cerrar</button>
+                            <div className="modal-footer border-0">
+                                <button type="button" className="btn btn-outline-secondary" onClick={handleClose}>Cerrar</button>
                                 <button
-                                    className="btn btn-primary btn-lg"
+                                    className="btn btn-primary"
                                     onClick={() => {
                                         addToCart(selectedProduct);
                                         handleClose();
