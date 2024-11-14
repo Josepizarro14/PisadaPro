@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useCart } from '../contexts/CartContext';
 import '../styles/styles.css';
 
 const catalogApi = axios.create({
@@ -11,6 +12,7 @@ const catalogApi = axios.create({
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const { addToCart } = useCart(); // Usa la función addToCart del contexto
 
     useEffect(() => {
         const fetchRandomProducts = async () => {
@@ -113,7 +115,15 @@ const Home = () => {
                                         <p className="text-muted">{selectedProduct.descripcion}</p>
                                         <p className="text-primary fw-bold">${selectedProduct.precio}</p>
                                         <p className="fw-bold">Stock: {selectedProduct.stock}</p>
-                                        <button className="btn btn-primary btn-lg mt-3">Agregar al carrito</button>
+                                        <button
+                                            className="btn btn-primary btn-lg mt-3"
+                                            onClick={() => {
+                                                addToCart(selectedProduct);
+                                                handleClose();
+                                            }}
+                                        >
+                                            Agregar al carrito
+                                        </button>
                                     </div>
                                 </div>
                             </div>

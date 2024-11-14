@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { getProductsByCategory } from '../services/api'; // Asegúrate de que la ruta a api.js sea correcta
 import '../styles/catalog.css'; // Puedes personalizar el estilo en este archivo CSS
 import 'bootstrap/dist/css/bootstrap.min.css'; // Asegúrate de tener Bootstrap para usar el modal
+import { useCart } from '../contexts/CartContext';
 
 const Hombre = () => {
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const productsPerPage = 9;
+    const { addToCart } = useCart(); // Usa la función addToCart del contexto
 
     // Obtener productos de la categoría "Hombre" al cargar el componente
     useEffect(() => {
@@ -55,7 +57,10 @@ const Hombre = () => {
                                 <p className="card-text">Stock: {product.stock}</p> {/* Mostrar stock */}
                                 <div className="d-flex justify-content-between">
                                     <button className="btn btn-primary" onClick={() => handleShowDetails(product)}>Ver detalles</button>
-                                    <button className="btn btn-secondary">Agregar al carrito</button>
+                                    <button className="btn btn-secondary" onClick={() => {
+                                        addToCart(product);
+                                        handleClose();
+                                    }}>Agregar al carrito</button>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +100,10 @@ const Hombre = () => {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={handleClose}>Cerrar</button>
-                                <button type="button" className="btn btn-primary">Agregar al carrito</button>
+                                <button type="button" className="btn btn-primary" onClick={() => {
+                                        addToCart(selectedProduct);
+                                        handleClose();
+                                    }}>Agregar al carrito</button>
                             </div>
                         </div>
                     </div>

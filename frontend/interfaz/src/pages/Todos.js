@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { getAllProducts } from '../services/api'; // Asegúrate de que la ruta a api.js sea correcta
 import '../styles/catalog.css'; // Personaliza los estilos en este archivo CSS
 import 'bootstrap/dist/css/bootstrap.min.css'; // Asegúrate de tener Bootstrap para usar el modal
+import { useCart } from '../contexts/CartContext';
+
 
 const Todos = () => {
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const { addToCart } = useCart(); // Usa la función addToCart del contexto
     const productsPerPage = 9;
 
     // Obtener todos los productos al cargar el componente
@@ -55,7 +58,10 @@ const Todos = () => {
                                 <p className="card-text">Stock: {product.stock}</p> {/* Mostrar stock */}
                                 <div className="d-flex justify-content-between">
                                     <button className="btn btn-primary" onClick={() => handleShowDetails(product)}>Ver detalles</button>
-                                    <button className="btn btn-secondary">Agregar al carrito</button>
+                                    <button className="btn btn-secondary" onClick={() => {
+                                        addToCart(product);
+                                        handleClose();
+                                    }}>Agregar al carrito</button>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +101,15 @@ const Todos = () => {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={handleClose}>Cerrar</button>
-                                <button type="button" className="btn btn-primary">Agregar al carrito</button>
+                                <button
+                                    className="btn btn-primary btn-lg"
+                                    onClick={() => {
+                                        addToCart(selectedProduct);
+                                        handleClose();
+                                    }}
+                                >
+                                    Agregar al carrito
+                                </button>
                             </div>
                         </div>
                     </div>
