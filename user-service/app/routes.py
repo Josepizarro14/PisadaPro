@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, abort, flash
-from .models import Cliente  # Asegúrate de importar tu modelo Cliente
+from .models import Cliente, HistorialCompra  # Asegúrate de importar tu modelo Cliente
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 

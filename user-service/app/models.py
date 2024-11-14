@@ -1,6 +1,7 @@
 from .database import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 class Cliente(db.Model, UserMixin):
     __tablename__ = 'clientes'
@@ -48,5 +49,43 @@ class Cliente(db.Model, UserMixin):
             "email": self.email,
             "telefono": self.telefono,
             "rol": self.rol
+        }
+    
+class HistorialCompra(db.Model):
+    __tablename__ = 'historial_compra'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rut_persona = db.Column(db.String(12), db.ForeignKey('clientes.rut_persona'), nullable=False)
+    nombre_zapatilla = db.Column(db.String(100), nullable=False)
+    descripcion = db.Column(db.String(255), nullable=False)
+    precio = db.Column(db.Integer, nullable=False)
+    categoria = db.Column(db.String(50), nullable=False)
+    stock = db.Column(db.Integer, nullable=False)
+    imagen = db.Column(db.String(255), nullable=False)
+    fecha_compra = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relación con Cliente
+    cliente = db.relationship('Cliente', backref=db.backref('historial_compras', lazy=True))
+
+    def __init__(self, rut_persona, nombre_zapatilla, descripcion, precio, categoria, stock, imagen):
+        self.rut_persona = rut_persona
+        self.nombre_zapatilla = nombre_zapatilla
+        self.descripcion = descripcion
+        self.precio = precio
+        self.categoria = categoria
+        self.stock = stock
+        self.imagen = imagen
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "rut_persona": self.rut_persona,
+            "nombre_zapatilla": self.nombre_zapatilla,
+            "descripcion": self.descripcion,
+            "precio": self.precio,
+            "categoria": self.categoria,
+            "stock": self.stock,
+            "imagen": self.imagen,
+            "fecha_compra": self.fecha_compra
         }
 
