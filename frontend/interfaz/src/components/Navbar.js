@@ -59,7 +59,7 @@ const Navbar = () => {
                             </button>
                             {showCartDropdown && (
                                 <div className="cart-dropdown">
-                                    <ul className={`list-group ${cartItems.length > 3 ? 'cart-dropdown-scrollable' : ''}`}>
+                                    <ul className={`list-group ${cartItems.length > 2 ? 'cart-dropdown-scrollable' : ''}`}>
                                         {cartItems.length > 0 ? (
                                             cartItems.map((item, index) => (
                                                 <li key={index} className="list-group-item d-flex align-items-center">
@@ -86,7 +86,7 @@ const Navbar = () => {
                                         )}
                                     </ul>
                                     <div className="dropdown-footer">
-                                        <Link to="/cart" className="btn btn-primary btn-sm">Ver Carrito Completo</Link>
+                                        <Link to="/cart" className="btn btn-primary btn-sm">Comprar carrito</Link>
                                     </div>
                                 </div>
                             )}

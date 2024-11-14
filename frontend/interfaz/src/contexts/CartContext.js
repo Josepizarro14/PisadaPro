@@ -1,12 +1,20 @@
-// src/contexts/CartContext.js
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
+    // Obtener el carrito de localStorage o establecer un carrito vacío si no existe.
+    const [cartItems, setCartItems] = useState(() => {
+        const savedCart = localStorage.getItem('cartItems');
+        return savedCart ? JSON.parse(savedCart) : [];
+    });
+
+    // Cada vez que cambie el carrito, guardarlo en localStorage.
+    useEffect(() => {
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    }, [cartItems]);
 
     const addToCart = (product) => {
         setCartItems((prevItems) => {
@@ -24,9 +32,6 @@ export const CartProvider = ({ children }) => {
     const removeFromCart = (itemId) => {
         setCartItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
     };
-    
-
-    
 
     return (
         <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
