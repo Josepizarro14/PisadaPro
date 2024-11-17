@@ -15,6 +15,7 @@ import Hombre from './pages/Hombre';
 import Mujer from './pages/Mujer';
 import Nino from './pages/Nino';
 import Todos from './pages/Todos';
+import Checkout from './pages/Checkout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import UpdateAccount from './components/UpdateAccount';
@@ -38,6 +39,7 @@ function App() {
                         <Route path="/category/nino" element={<Nino />} />
                         <Route path="/category/todos" element={<Todos />} />
                         <Route path='/product-manager' element={<ProductManager />} />
+                        <Route path="/checkout" element={<Checkout />} />
                         <Route path="*" element={<NotFound />} />
                         {/* Agrega más rutas aquí */}
                     </Routes>

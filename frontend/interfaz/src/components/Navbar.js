@@ -1,5 +1,4 @@
-// src/components/Navbar.js
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useCart } from '../contexts/CartContext';
@@ -13,6 +12,29 @@ const Navbar = () => {
     const userRole = localStorage.getItem('userRole');
     const navigate = useNavigate();
     const [showCartDropdown, setShowCartDropdown] = useState(false);
+    const [cartTotal, setCartTotal] = useState(0); // Estado para el total del carrito
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        // Calcular el total del carrito cada vez que cambian los elementos
+        const calculateTotal = () => {
+            const total = cartItems.reduce((sum, item) => sum + item.precio * item.quantity, 0);
+            setCartTotal(total);
+        };
+
+        calculateTotal();
+    }, [cartItems]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowCartDropdown(false); // Cierra el carrito si se hace clic fuera
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const handleLogout = async () => {
         if (isAuthenticated) {
@@ -33,7 +55,6 @@ const Navbar = () => {
 
     const toggleCartDropdown = () => setShowCartDropdown(!showCartDropdown);
 
-    // Nueva función para manejar la eliminación de elementos
     const handleRemoveItem = (itemId) => {
         removeFromCart(itemId);
     };
@@ -58,7 +79,7 @@ const Navbar = () => {
                                 🛒 Carrito ({cartItems.length})
                             </button>
                             {showCartDropdown && (
-                                <div className="cart-dropdown">
+                                <div className="cart-dropdown" ref={dropdownRef}>
                                     <ul className={`list-group ${cartItems.length > 2 ? 'cart-dropdown-scrollable' : ''}`}>
                                         {cartItems.length > 0 ? (
                                             cartItems.map((item, index) => (
@@ -85,12 +106,16 @@ const Navbar = () => {
                                             <li className="list-group-item">Carrito vacío</li>
                                         )}
                                     </ul>
-                                    <div className="dropdown-footer">
-                                        <Link to="/cart" className="btn btn-primary btn-sm">Comprar carrito</Link>
+                                    {cartItems.length > 0 && (
+                                        <div className="cart-total mt-2">
+                                            <strong>Total: </strong>${cartTotal.toFixed(2)}
+                                        </div>
+                                    )}
+                                    <div className="dropdown-footer mt-2">
+                                        <Link to="/checkout" className="btn btn-primary btn-sm">Comprar carrito</Link>
                                     </div>
                                 </div>
                             )}
-
                         </li>
                         {isAuthenticated ? (
                             <li className="nav-item dropdown">
