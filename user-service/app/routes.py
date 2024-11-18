@@ -292,3 +292,20 @@ def load_routes(app, db):
             'telefono': current_user.telefono
         }
         return jsonify(user_info), 200
+    
+    @app.route('/api/userCheckout', methods=['GET'])
+    @login_required
+    def get_user_rol():
+        """Retorna los datos del usuario actual."""
+        user_info = {
+            'rut_persona': current_user.rut_persona,
+            'nombre': current_user.nombre,
+            'apellido': current_user.apellido,
+            'direccion': current_user.direccion,
+            'comuna': current_user.comuna,
+            'region': current_user.region,
+            'email': current_user.email,
+            'telefono': current_user.telefono,
+            'rol': current_user.rol,
+        }
+        return jsonify(user_info), 200

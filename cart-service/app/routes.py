@@ -26,7 +26,7 @@ def add_to_cart():
         cliente = Cliente.query.filter_by(email=data['cliente_email']).first()
         if not cliente:
             # Si el cliente no existe, lo creamos
-            cliente = Cliente(email=data['cliente_email'], nombre=data['nombre_cliente'], apellido=data['apellido_cliente'], direccion=data['direccion_cliente'], telefono=data['telefono_cliente'], rut_persona=data['rut_cliente'], comuna=data['comuna_cliente'], region=data['region_cliente'])  # Añadir
+            cliente = Cliente(email=data['email'], nombre=data['nombre'], apellido=data['apellido'], direccion=data['direccion'], telefono=data['telefono'], rut_persona=data['rut'], comuna=data['comuna'], region=data['region'])  # Añadir
             db.session.add(cliente)
             db.session.commit()
 
@@ -59,43 +59,43 @@ def checkout():
     data = request.json
     cliente_email = data.get('cliente_email')
     productos = data.get('productos', [])
-    
-    if not cliente_email:
-        return jsonify({"error": "Email del cliente es requerido"}), 400
+    print("Datos recibidos:", data)
+
     if not productos:
         return jsonify({"error": "Debe haber productos en el carrito"}), 400
 
     try:
-        # Verificar si el cliente existe en la tabla Clientes
         cliente = Cliente.query.filter_by(email=cliente_email).first()
         if not cliente:
-            # Verificar que rut_persona no sea None ni vacío
-            rut_persona = data.get('rut_cliente')
-            if not rut_persona:
-                return jsonify({"error": "Rut del cliente es requerido"}), 400
-
-            # Si el cliente no existe, lo creamos
             cliente = Cliente(
-                rut_persona=rut_persona,  # Asegúrate de que rut_persona esté presente
-                nombre=data.get('nombre_cliente'),
-                apellido=data.get('apellido_cliente'),
-                direccion=data.get('direccion_cliente'),
-                comuna=data.get('comuna_cliente'),
-                region=data.get('region_cliente'),
+                rut_persona=data.get('rut_cliente', 'sin-rut'),
                 email=cliente_email,
-                telefono=data.get('telefono_cliente')
+                nombre=data.get('nombre_cliente', 'Cliente'),
+                apellido=data.get('apellido_cliente', 'Invitado'),
+                direccion=data.get('direccion_cliente', 'Sin dirección'),
+                comuna=data.get('comuna_cliente', 'Sin comuna'),
+                region=data.get('region_cliente', 'Sin región'),
+                telefono=data.get('telefono_cliente', 'Sin teléfono'),
+                rol='invitado'
             )
             db.session.add(cliente)
-            db.session.commit()
+            db.session.flush()
 
-        # Buscar o crear la compra activa para el cliente
-        compra = Compra.query.filter_by(cliente_email=cliente_email, estado='pendiente').first()
-        if not compra:
-            compra = Compra(cliente_email=cliente_email, fecha=datetime.utcnow(), total=0, estado='pendiente')
-            db.session.add(compra)
-            db.session.flush()  # Generar el ID de la compra
+        # Crear compra con datos del cliente
+        compra = Compra(
+            cliente_email=cliente_email,
+            fecha=datetime.utcnow(),
+            total=0,
+            estado='pendiente',
+            nombre_cliente=cliente.nombre,
+            direccion_cliente=cliente.direccion,
+            comuna_cliente=cliente.comuna,
+            region_cliente=cliente.region,
+            telefono_cliente=cliente.telefono
+        )
+        db.session.add(compra)
+        db.session.flush()
 
-        # Añadir los productos al carrito
         total = 0
         for producto in productos:
             nuevo_item = DetalleCompra(
@@ -109,15 +109,20 @@ def checkout():
             db.session.add(nuevo_item)
             total += producto['precio'] * producto['cantidad']
 
-        # Actualizar el total de la compra
         compra.total = total
-        compra.estado = 'finalizada'  # Marcamos la compra como finalizada
+        compra.estado = 'finalizada'
         db.session.commit()
 
         return jsonify({"message": "Compra realizada con éxito", "compra": compra.to_dict()}), 201
+
     except Exception as e:
         db.session.rollback()
+        print(f"Error en el endpoint /checkout: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+
+
 
 
 

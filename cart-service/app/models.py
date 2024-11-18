@@ -9,25 +9,27 @@ class Cliente(db.Model, UserMixin):
     __tablename__ = 'clientes'
     
     rut_persona = db.Column(db.String(12), nullable=False)
-    nombre = db.Column(db.String(50), nullable=False)
-    apellido = db.Column(db.String(50), nullable=False)
-    direccion = db.Column(db.String(100), nullable=False)
-    comuna = db.Column(db.String(50), nullable=False)
-    region = db.Column(db.String(50), nullable=False)
+    nombre = db.Column(db.String(50))
+    apellido = db.Column(db.String(50))
+    direccion = db.Column(db.String(100))
+    comuna = db.Column(db.String(50))
+    region = db.Column(db.String(50))
     email = db.Column(db.String(100), primary_key=True, unique=True, nullable=False)
-    telefono = db.Column(db.String(15), nullable=False)
+    telefono = db.Column(db.String(15))
+    rol = db.Column(db.String(20), default='invitado')  # Nuevo campo para roles
 
     compras = db.relationship('Compra', backref='cliente', lazy=True)
 
-    def __init__(self, rut_persona, nombre, apellido, direccion, comuna, region, email, telefono):
+    def __init__(self, rut_persona, email, nombre=None, apellido=None, direccion=None, comuna=None, region=None, telefono=None, rol='invitado'):
         self.rut_persona = rut_persona
+        self.email = email
         self.nombre = nombre
         self.apellido = apellido
         self.direccion = direccion
         self.comuna = comuna
         self.region = region
-        self.email = email
         self.telefono = telefono
+        self.rol = rol
 
     def to_dict(self):
         return {
@@ -39,7 +41,9 @@ class Cliente(db.Model, UserMixin):
             "region": self.region,
             "email": self.email,
             "telefono": self.telefono,
+            "rol": self.rol,
         }
+
 
 # Tabla de Compras
 class Compra(db.Model):
@@ -49,7 +53,14 @@ class Compra(db.Model):
     cliente_email = db.Column(db.String(100), db.ForeignKey('clientes.email'), nullable=False)
     fecha = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     total = db.Column(db.Float, nullable=False)
-    estado = db.Column(db.String(20), nullable=False, default='pendiente')  # Añadir la columna 'estado'
+    estado = db.Column(db.String(20), nullable=False, default='pendiente')
+
+    # Nuevas columnas para guardar datos del cliente
+    nombre_cliente = db.Column(db.String(50), nullable=False)
+    direccion_cliente = db.Column(db.String(100), nullable=False)
+    comuna_cliente = db.Column(db.String(50), nullable=False)
+    region_cliente = db.Column(db.String(50), nullable=False)
+    telefono_cliente = db.Column(db.String(15), nullable=True)
 
     detalles = db.relationship('DetalleCompra', backref='compra', lazy=True)
 
@@ -59,9 +70,15 @@ class Compra(db.Model):
             "cliente_email": self.cliente_email,
             "fecha": self.fecha.isoformat(),
             "total": self.total,
-            "estado": self.estado,  # Incluir el estado en la representación en diccionario
+            "estado": self.estado,
+            "nombre_cliente": self.nombre_cliente,
+            "direccion_cliente": self.direccion_cliente,
+            "comuna_cliente": self.comuna_cliente,
+            "region_cliente": self.region_cliente,
+            "telefono_cliente": self.telefono_cliente,
             "detalles": [detalle.to_dict() for detalle in self.detalles]
         }
+
 
 
 # Tabla de Detalles de Compra

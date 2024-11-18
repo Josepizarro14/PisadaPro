@@ -33,8 +33,14 @@ export const CartProvider = ({ children }) => {
         setCartItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
     };
 
+    // Función para limpiar el carrito
+    const clearCart = () => {
+        setCartItems([]); // Establece el carrito vacío
+        localStorage.removeItem('cartItems'); // Elimina el carrito del localStorage
+    };
+
     return (
-        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart }}>
             {children}
         </CartContext.Provider>
     );
