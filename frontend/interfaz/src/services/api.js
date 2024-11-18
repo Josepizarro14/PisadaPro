@@ -19,6 +19,13 @@ const catalogApi = axios.create({
   withCredentials: true,
 });
 
+// Instancia para el microservicio de productos
+const cartApi = axios.create({
+  baseURL: 'http://localhost:5003/cart', // URL del microservicio de catalogo
+  withCredentials: true,
+});
+
+
 
 // Usar Axios en lugar de fetch para la función de login
 export const login = async (email, password) => {
@@ -67,4 +74,4 @@ export const getAllProducts = async () => {
 
 
 // Exportar las instancias para ser utilizadas en otros archivos
-export { userApi, productApi, catalogApi };
+export { userApi, productApi, catalogApi, cartApi };

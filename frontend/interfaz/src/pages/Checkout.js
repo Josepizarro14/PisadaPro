@@ -1,7 +1,7 @@
-// src/pages/Checkout.js
 import React, { useState, useEffect } from 'react';
 import { userApi } from '../services/api'; // API para obtener datos del usuario
 import { useCart } from '../contexts/CartContext'; // Contexto para el carrito
+import { cartApi } from '../services/api'; // API para obtener datos del carrito
 import { useNavigate } from 'react-router-dom'; // Para redirigir al usuario
 import { FaUserAlt, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaLock } from 'react-icons/fa'; // Íconos para los campos
 
@@ -15,6 +15,7 @@ const Checkout = () => {
         email: '',
         telefono: '',
         rut_persona: '',
+        contrasena: '',
     });
     const [error, setError] = useState('');
     const [total, setTotal] = useState(0);
@@ -59,15 +60,15 @@ const Checkout = () => {
                     region: userData.region,
                     email: userData.email,
                     telefono: userData.telefono,
-                    contrasena: 'defaultPassword123', // Puede ser una contraseña generada o pedida por el usuario
+                    contrasena: userData.contrasena,
                 };
                 await userApi.post('/register', registrationData);
-                await handleLogin(userData.email, 'defaultPassword123');
+                await handleLogin(userData.email, userData.contrasena);
             }
-
+    
             const purchaseData = {
                 productos: cartItems.map(item => ({
-                    nombre: item.nombre,
+                    nombre_zapatilla: item.nombre,
                     descripcion: item.descripcion,
                     precio: item.precio,
                     categoria: item.categoria,
@@ -76,19 +77,34 @@ const Checkout = () => {
                 })),
                 total,
                 fecha: new Date().toISOString(),
-                rut_persona: userData.rut_persona,
+                cliente_email: userData.email,
+                nombre_cliente: userData.nombre,
+                apellido_cliente: userData.apellido,
+                direccion_cliente: userData.direccion,
+                comuna_cliente: userData.comuna,
+                region_cliente: userData.region,
+                telefono_cliente: userData.telefono,
+                rut_cliente: userData.rut_persona,  // Asegúrate de que esté bien asignado
             };
-
-            await userApi.post('/purchase', purchaseData);
-
-            alert('Compra realizada con éxito.');
-            clearCart();
-            navigate('/');
+            console.log(purchaseData);  // Para depurar el envío de datos
+            
+            
+    
+            const response = await cartApi.post('/checkout', purchaseData);
+    
+            if (response.data.message === "Compra realizada con éxito") {
+                alert('Compra realizada con éxito.');
+                clearCart();
+                navigate('/');
+            } else {
+                setError('Error al realizar la compra.');
+            }
         } catch (error) {
             console.error(error);
             setError('Error al realizar la compra.');
         }
     };
+    
 
     const handleLogin = async (email, password) => {
         try {
@@ -175,7 +191,7 @@ const Checkout = () => {
                                     <label className="form-label">Contraseña</label>
                                     <div className="input-group">
                                         <span className="input-group-text"><FaLock /></span>
-                                        <input type="password" name="contrasena" onChange={handleChange} className="form-control" required />
+                                        <input type="password" name="contrasena" value={userData.contrasena} onChange={handleChange} className="form-control" required />
                                     </div>
                                 </div>
                             </form>
@@ -202,18 +218,15 @@ const Checkout = () => {
                         {cartItems.map((item, index) => (
                             <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
-                                    <img src={item.imagen} alt={item.nombre} className="img-thumbnail" width="50" />
-                                    <div className="ms-3">
-                                        <strong>{item.nombre}</strong>
-                                        <p className="mb-0">{item.descripcion}</p>
-                                    </div>
+                                    <img src={item.imagen} alt={item.nombre} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
+                                    {item.nombre}
                                 </div>
-                                <span>{item.precio} x {item.quantity}</span>
+                                <span className="badge bg-primary rounded-pill">${item.precio}</span>
                             </li>
                         ))}
                     </ul>
                     <h4 className="mt-3">Total: ${total}</h4>
-                    <button className="btn btn-primary mt-3" onClick={handlePurchase}>Realizar Compra</button>
+                    <button className="btn btn-primary" onClick={handlePurchase}>Realizar Compra</button>
                 </div>
             </div>
         </div>

@@ -2,8 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-
-db = SQLAlchemy()
+from app.database import db
 
 # Tabla de Clientes
 class Cliente(db.Model, UserMixin):
@@ -17,12 +16,10 @@ class Cliente(db.Model, UserMixin):
     region = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), primary_key=True, unique=True, nullable=False)
     telefono = db.Column(db.String(15), nullable=False)
-    contrasena = db.Column(db.String(255), nullable=False)
-    rol = db.Column(db.String(20), nullable=False, default='cliente') 
 
     compras = db.relationship('Compra', backref='cliente', lazy=True)
 
-    def __init__(self, rut_persona, nombre, apellido, direccion, comuna, region, email, telefono, contrasena, rol='cliente'):
+    def __init__(self, rut_persona, nombre, apellido, direccion, comuna, region, email, telefono):
         self.rut_persona = rut_persona
         self.nombre = nombre
         self.apellido = apellido
@@ -31,14 +28,6 @@ class Cliente(db.Model, UserMixin):
         self.region = region
         self.email = email
         self.telefono = telefono
-        self.set_password(contrasena)
-        self.rol = rol
-
-    def set_password(self, contrasena):
-        self.contrasena = generate_password_hash(contrasena)
-
-    def check_password(self, contrasena):
-        return check_password_hash(self.contrasena, contrasena)
 
     def to_dict(self):
         return {
@@ -50,7 +39,6 @@ class Cliente(db.Model, UserMixin):
             "region": self.region,
             "email": self.email,
             "telefono": self.telefono,
-            "rol": self.rol
         }
 
 # Tabla de Compras
@@ -61,6 +49,7 @@ class Compra(db.Model):
     cliente_email = db.Column(db.String(100), db.ForeignKey('clientes.email'), nullable=False)
     fecha = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     total = db.Column(db.Float, nullable=False)
+    estado = db.Column(db.String(20), nullable=False, default='pendiente')  # Añadir la columna 'estado'
 
     detalles = db.relationship('DetalleCompra', backref='compra', lazy=True)
 
@@ -70,8 +59,10 @@ class Compra(db.Model):
             "cliente_email": self.cliente_email,
             "fecha": self.fecha.isoformat(),
             "total": self.total,
+            "estado": self.estado,  # Incluir el estado en la representación en diccionario
             "detalles": [detalle.to_dict() for detalle in self.detalles]
         }
+
 
 # Tabla de Detalles de Compra
 class DetalleCompra(db.Model):

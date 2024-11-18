@@ -6,7 +6,7 @@ from datetime import datetime
 class Cliente(db.Model, UserMixin):
     __tablename__ = 'clientes'
     
-    rut_persona = db.Column(db.String(12), nullable=False)
+    rut_persona = db.Column(db.String(12), unique=True, nullable=False)  # Añadir unique=True
     nombre = db.Column(db.String(50), nullable=False)
     apellido = db.Column(db.String(50), nullable=False)
     direccion = db.Column(db.String(100), nullable=False)
@@ -14,8 +14,8 @@ class Cliente(db.Model, UserMixin):
     region = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), primary_key=True, unique=True, nullable=False)
     telefono = db.Column(db.String(15), nullable=False)
-    contrasena = db.Column(db.String(255), nullable=False)  # Cambiado a 255 caracteres
-    rol = db.Column(db.String(20), nullable=False, default='cliente')  # 'cliente' o 'administrador'
+    contrasena = db.Column(db.String(255), nullable=False)
+    rol = db.Column(db.String(20), nullable=False, default='cliente')
 
     def __init__(self, rut_persona, nombre, apellido, direccion, comuna, region, email, telefono, contrasena, rol='cliente'):
         self.rut_persona = rut_persona
