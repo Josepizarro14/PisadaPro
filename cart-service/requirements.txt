@@ -6,4 +6,6 @@ Flask-Login
 flask-cors
 blueprint
 flask_migrate
+transbank-sdk==5.0.0
 transbank-sdk
+python-dotenv
