@@ -70,7 +70,10 @@ const productSchema = new mongoose.Schema({
     descripcion: { type: String, required: true },
     precio: { type: Number, required: true, min: 0 },
     categoria: { type: String, required: true },
-    stock: { type: Number, required: true, min: 0 },
+    stockPorTalla: { 
+        type: Map,
+        of: Number,
+        required: true, min: 0 },
     imagen: { type: String },
     fechaCreacion: { type: Date, default: Date.now }
 });
@@ -81,6 +84,17 @@ const Product = mongoose.model('Product', productSchema);
 
 // Crear un producto
 app.post('/products', async (req, res) => {
+    const { stockPorTalla } = req.body;
+
+    if (!stockPorTalla || typeof stockPorTalla !== 'object') {
+        return res.status(400).send({ error: 'El stock por talla es obligatorio y debe ser un objeto' });
+    }
+
+    for (const [talla, cantidad] of Object.entries(stockPorTalla)) {
+        if (isNaN(cantidad) || cantidad < 0) {
+            return res.status(400).send({ error: `Cantidad inválida para la talla ${talla}` });
+        }
+    }
     try {
         const product = new Product(req.body);
         await product.save();

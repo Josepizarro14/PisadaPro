@@ -6,7 +6,17 @@ const productSchema = new mongoose.Schema({
     descripcion: { type: String, required: true },
     precio: { type: Number, required: true },
     categoria: { type: String, required: true },
-    stock: { type: Number, required: true },
+    stockPorTalla: {
+        type: Map,
+        of: Number,
+        required: true,
+        default: () => {
+            const initialStock = {};
+            for (let i = 30; i <= 45; i++) {
+                initialStock[i] = 0;  // Stock inicial para cada talla
+            }
+            return initialStock;
+        }},
     imagen: { type: String },  // URL de la imagen del producto
     fechaCreacion: { type: Date, default: Date.now }
 });
