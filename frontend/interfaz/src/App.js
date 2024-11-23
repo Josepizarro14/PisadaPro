@@ -16,6 +16,8 @@ import Mujer from './pages/Mujer';
 import Nino from './pages/Nino';
 import Todos from './pages/Todos';
 import Checkout from './pages/Checkout';
+import ConfirmPayment from './pages/ConfirmPayment';
+import OrderSuccess from './pages/OrderSuccess';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import UpdateAccount from './components/UpdateAccount';
@@ -41,6 +43,8 @@ function App() {
                         <Route path='/product-manager' element={<ProductManager />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="*" element={<NotFound />} />
+                        <Route path="/confirm-payment" element={<ConfirmPayment />} />
+                        <Route path="/order-success" element={<OrderSuccess />} />
                         {/* Agrega más rutas aquí */}
                     </Routes>
                 </div>

@@ -16,10 +16,14 @@ const Checkout = () => {
     });
     const [error, setError] = useState('');
     const [total, setTotal] = useState(0);
-    const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+    const [successMessage, setSuccessMessage] = useState('');
+    const [cardNumber, setCardNumber] = useState('');
+    const [expiryDate, setExpiryDate] = useState('');
+    const [cvv, setCvv] = useState('');
+    const [cardError, setCardError] = useState('');
     const { cartItems, clearCart } = useCart();
     const navigate = useNavigate();
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'; // Verificar autenticación
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -54,7 +58,28 @@ const Checkout = () => {
         calculateTotal();
     }, [cartItems]);
 
+    // Algoritmo de Luhn para validar tarjeta
+    const validateCardNumber = (number) => {
+        let sum = 0;
+        let shouldDouble = false;
+        for (let i = number.length - 1; i >= 0; i--) {
+            let digit = parseInt(number.charAt(i));
+            if (shouldDouble) {
+                if ((digit *= 2) > 9) digit -= 9;
+            }
+            sum += digit;
+            shouldDouble = !shouldDouble;
+        }
+        return sum % 10 === 0;
+    };
+
     const handlePurchase = async () => {
+        if (!validateCardNumber(cardNumber)) {
+            setCardError('El número de tarjeta no es válido.');
+            return;
+        }
+        setCardError('');
+
         try {
             const purchaseData = {
                 cliente_email: userData.email,
@@ -74,24 +99,24 @@ const Checkout = () => {
                 comuna_cliente: userData.comuna,
                 region_cliente: userData.region,
                 telefono_cliente: userData.telefono,
+                tarjeta_credito: {
+                    numero: cardNumber,
+                    vencimiento: expiryDate,
+                    cvv: cvv,
+                },
             };
-    
-            const response = await cartApi.post('/checkout', purchaseData);
-    
-            if (response.data.message === "Compra realizada con éxito") {
-                setSuccessMessage('Compra realizada con éxito. ¡Gracias por tu compra!'); // Actualizar el mensaje de éxito
-                clearCart();
-                setTimeout(() => {
-                    navigate('/'); // Redirigir después de 3 segundos
-                }, 3000);
-            } else {
-                setError('Error al realizar la compra.');
-            }
+
+            // Redirige a la página de confirmación de pago con los datos de la compra
+            setTimeout(() => {
+                navigate('/confirm-payment', { state: { purchaseData } });
+            }, 3000);
+
         } catch (error) {
             console.error(error);
             setError('Error al realizar la compra.');
         }
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -102,7 +127,8 @@ const Checkout = () => {
         <div className="container mt-5">
             <h2 className="text-center mb-4">Checkout</h2>
             {error && <div className="alert alert-danger">{error}</div>}
-            {successMessage && <div className="alert alert-success">{successMessage}</div>} {/* Mostrar mensaje de éxito */}
+            {successMessage && <div className="alert alert-success">{successMessage}</div>}
+            {cardError && <div className="alert alert-danger">{cardError}</div>}
             <div className="row">
                 <div className="col-md-6">
                     <h4 className="mb-3">Información del Cliente</h4>
@@ -119,8 +145,6 @@ const Checkout = () => {
                                         onChange={handleChange}
                                         className="form-control"
                                         required
-                                        onInvalid={(e) => e.target.setCustomValidity('Por favor, ingrese su nombre.')}
-                                        onInput={(e) => e.target.setCustomValidity('')}
                                     />
                                 </div>
                             </div>
@@ -135,8 +159,6 @@ const Checkout = () => {
                                         onChange={handleChange}
                                         className="form-control"
                                         required
-                                        onInvalid={(e) => e.target.setCustomValidity('Por favor, ingrese su dirección.')}
-                                        onInput={(e) => e.target.setCustomValidity('')}
                                     />
                                 </div>
                             </div>
@@ -149,8 +171,6 @@ const Checkout = () => {
                                     onChange={handleChange}
                                     className="form-control"
                                     required
-                                    onInvalid={(e) => e.target.setCustomValidity('Por favor, ingrese su comuna.')}
-                                    onInput={(e) => e.target.setCustomValidity('')}
                                 />
                             </div>
                             <div className="mb-3">
@@ -162,8 +182,6 @@ const Checkout = () => {
                                     onChange={handleChange}
                                     className="form-control"
                                     required
-                                    onInvalid={(e) => e.target.setCustomValidity('Por favor, ingrese su región.')}
-                                    onInput={(e) => e.target.setCustomValidity('')}
                                 />
                             </div>
                             <div className="mb-3">
@@ -177,8 +195,6 @@ const Checkout = () => {
                                         onChange={handleChange}
                                         className="form-control"
                                         required
-                                        onInvalid={(e) => e.target.setCustomValidity('Por favor, ingrese un email válido.')}
-                                        onInput={(e) => e.target.setCustomValidity('')}
                                     />
                                 </div>
                             </div>
@@ -193,8 +209,6 @@ const Checkout = () => {
                                         onChange={handleChange}
                                         className="form-control"
                                         required
-                                        onInvalid={(e) => e.target.setCustomValidity('Por favor, ingrese su teléfono.')}
-                                        onInput={(e) => e.target.setCustomValidity('')}
                                     />
                                 </div>
                             </div>
@@ -216,7 +230,42 @@ const Checkout = () => {
                         ))}
                     </ul>
                     <h4 className="mt-3">Total: ${total}</h4>
-                    <button className="btn btn-primary" onClick={handlePurchase}>Realizar Compra</button>
+
+                    {/* Formulario de tarjeta */}
+                    <div className="mb-3">
+                        <label className="form-label">Número de Tarjeta</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={cardNumber}
+                            onChange={(e) => setCardNumber(e.target.value)}
+                            maxLength="16"
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Fecha de Vencimiento</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={expiryDate}
+                            onChange={(e) => setExpiryDate(e.target.value)}
+                            placeholder="MM/AA"
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">CVV</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={cvv}
+                            onChange={(e) => setCvv(e.target.value)}
+                            maxLength="3"
+                            required
+                        />
+                    </div>
+                    <button className="btn btn-success w-100" onClick={handlePurchase}>Realizar Compra</button>
                 </div>
             </div>
         </div>

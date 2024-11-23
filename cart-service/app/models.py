@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from app.database import db
+from sqlalchemy.dialects.postgresql import ENUM
 
 # Tabla de Clientes
 class Cliente(db.Model, UserMixin):
@@ -48,20 +49,28 @@ class Cliente(db.Model, UserMixin):
 # Tabla de Compras
 class Compra(db.Model):
     __tablename__ = 'compras'
-    
+
+    # Enumeración para el estado de la compra
+    ESTADOS = ('pendiente', 'pagada', 'cancelada', 'rechazada')
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    cliente_email = db.Column(db.String(100), db.ForeignKey('clientes.email'), nullable=False)
+    cliente_email = db.Column(db.String(100), db.ForeignKey('clientes.email'), nullable=False, index=True)
     fecha = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     total = db.Column(db.Float, nullable=False)
-    estado = db.Column(db.String(20), nullable=False, default='pendiente')
+    estado = db.Column(
+        ENUM(*ESTADOS, name='estado_compra', create_type=True),
+        nullable=False,
+        default='pendiente'
+    )
 
-    # Nuevas columnas para guardar datos del cliente
+    # Información adicional del cliente al momento de la compra
     nombre_cliente = db.Column(db.String(50), nullable=False)
     direccion_cliente = db.Column(db.String(100), nullable=False)
     comuna_cliente = db.Column(db.String(50), nullable=False)
     region_cliente = db.Column(db.String(50), nullable=False)
     telefono_cliente = db.Column(db.String(15), nullable=True)
 
+    # Relación con los detalles de compra
     detalles = db.relationship('DetalleCompra', backref='compra', lazy=True)
 
     def to_dict(self):

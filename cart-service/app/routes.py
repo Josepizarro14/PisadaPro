@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
 from app.models import db, Compra, DetalleCompra, Cliente  # Asegúrate de importar el modelo Cliente
-
+from transbank.webpay.webpay_plus.transaction import Transaction
 cart_bp = Blueprint('cart', __name__)
 
 # Ruta para obtener los productos en el carrito
@@ -181,3 +181,48 @@ def get_purchase_details():
         "compra": compra.to_dict(),
         "detalles": [item.to_dict() for item in detalles_compra]
     }), 200
+
+@cart_bp.route('/pay', methods=['POST'])
+def initiate_payment():
+    data = request.json
+    cliente_email = data.get('cliente_email')
+
+    # Verificar si existe una compra pendiente
+    compra = Compra.query.filter_by(cliente_email=cliente_email, estado='pendiente').first()
+    if not compra:
+        return jsonify({"error": "No hay compras pendientes para este cliente"}), 404
+
+    # Crear transacción con Transbank
+    try:
+        transaction = Transaction()
+        response = transaction.create(
+            buy_order=str(compra.id),
+            session_id=cliente_email,
+            amount=compra.total,
+            return_url='https://tusitio.com/cart/confirm'  # URL para confirmar el pago
+        )
+        return jsonify({"url": response['url'], "token": response['token']})
+    except Exception as e:
+        return jsonify({"error": f"Error al iniciar el pago: {str(e)}"}), 500
+
+@cart_bp.route('/confirm', methods=['POST'])
+def confirm_payment():
+    token = request.form.get('token_ws')
+    if not token:
+        return jsonify({"error": "Token no recibido"}), 400
+
+    # Confirmar transacción con Transbank
+    try:
+        transaction = Transaction()
+        response = transaction.commit(token)
+        if response['status'] == 'AUTHORIZED':
+            # Actualizar estado de la compra
+            compra = Compra.query.get(int(response['buy_order']))
+            compra.estado = 'pagada'
+            db.session.commit()
+            return jsonify({"message": "Pago confirmado", "compra": compra.to_dict()})
+        else:
+            return jsonify({"error": "Transacción no autorizada", "details": response}), 400
+    except Exception as e:
+        return jsonify({"error": f"Error al confirmar el pago: {str(e)}"}), 500
+
