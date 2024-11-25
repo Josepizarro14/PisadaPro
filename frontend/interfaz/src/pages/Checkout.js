@@ -17,9 +17,6 @@ const Checkout = () => {
     const [error, setError] = useState('');
     const [total, setTotal] = useState(0);
     const [successMessage, setSuccessMessage] = useState('');
-    const [cardNumber, setCardNumber] = useState('');
-    const [expiryDate, setExpiryDate] = useState('');
-    const [cvv, setCvv] = useState('');
     const [cardError, setCardError] = useState('');
     const { cartItems, clearCart } = useCart();
     const navigate = useNavigate();
@@ -59,73 +56,50 @@ const Checkout = () => {
         calculateTotal();
     }, [cartItems]);
 
-    // Algoritmo de Luhn para validar tarjeta
-    const validateCardNumber = (number) => {
-        let sum = 0;
-        let shouldDouble = false;
-        for (let i = number.length - 1; i >= 0; i--) {
-            let digit = parseInt(number.charAt(i));
-            if (shouldDouble) {
-                if ((digit *= 2) > 9) digit -= 9;
-            }
-            sum += digit;
-            shouldDouble = !shouldDouble;
-        }
-        return sum % 10 === 0;
-    };
-
     const handlePurchase = async () => {
-    if (isProcessing) return; // Prevenir que se envíen múltiples solicitudes
+        if (isProcessing) return; // Prevenir múltiples solicitudes
 
-    setIsProcessing(true); // Bloquear la función para que no se ejecute nuevamente
+        setIsProcessing(true);
 
-    if (!validateCardNumber(cardNumber)) {
-        setCardError('El número de tarjeta no es válido.');
-        setIsProcessing(false); // Volver a habilitar el botón si hay error
-        return;
-    }
-    setCardError('');
+        try {
+            const purchaseData = {
+                cliente_email: userData.email,
+                productos: cartItems.map(item => ({
+                    nombre_zapatilla: item.nombre,
+                    descripcion: item.descripcion,
+                    precio: item.precio,
+                    cantidad: item.quantity,
+                    talla: item.talla, // Incluye la talla seleccionada
+                    imagen: item.imagen,
+                })),
+                total,
+                fecha: new Date().toISOString(),
+                rut_cliente: userData.rut_persona,
+                nombre_cliente: userData.nombre,
+                direccion_cliente: userData.direccion,
+                comuna_cliente: userData.comuna,
+                region_cliente: userData.region,
+                telefono_cliente: userData.telefono,
+                estado: 'pendiente',
+            };
 
-    try {
-        const purchaseData = {
-            cliente_email: userData.email,
-            productos: cartItems.map(item => ({
-                nombre_zapatilla: item.nombre,
-                descripcion: item.descripcion,
-                precio: item.precio,
-                cantidad: item.quantity,
-                imagen: item.imagen,
-            })),
-            total,
-            fecha: new Date().toISOString(),
-            rut_cliente: userData.rut_persona,
-            nombre_cliente: userData.nombre,
-            direccion_cliente: userData.direccion,
-            comuna_cliente: userData.comuna,
-            region_cliente: userData.region,
-            telefono_cliente: userData.telefono,
-            estado: 'pendiente',
-        };
+            // Enviar al backend
+            const response = await cartApi.post('/checkout', purchaseData);
 
-        // Hacer la llamada al backend para guardar el pedido como pendiente
-        const response = await cartApi.post('/checkout', purchaseData);
-
-        if (response.status === 201) {
-            setSuccessMessage('Compra guardada como pendiente.');
-            clearCart(); // Limpiar el carrito después de guardar el pedido
-            // Redirigir al usuario a la página de confirmación de pago con los datos de compra
-            navigate('/confirm-payment', { state: { purchaseData } });
-        } else {
-            setError('Error al procesar la compra.');
+            if (response.status === 201) {
+                setSuccessMessage('Compra guardada como pendiente.');
+                clearCart(); // Limpiar el carrito después de guardar el pedido
+                navigate('/confirm-payment', { state: { purchaseData } });
+            } else {
+                setError('Error al procesar la compra.');
+            }
+        } catch (error) {
+            console.error(error);
+            setError('Error al realizar la compra.');
+        } finally {
+            setIsProcessing(false);
         }
-    } catch (error) {
-        console.error(error);
-        setError('Error al realizar la compra.');
-    } finally {
-        setIsProcessing(false); // Volver a habilitar el botón después de que termine la solicitud
-    }
-};
-    
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -231,18 +205,30 @@ const Checkout = () => {
                         {cartItems.map((item, index) => (
                             <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
-                                    <img src={item.imagen} alt={item.nombre} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
-                                    {item.nombre}
+                                    <img
+                                        src={item.imagen}
+                                        alt={item.nombre}
+                                        style={{ width: '50px', height: '50px', marginRight: '10px' }}
+                                    />
+                                    <div>
+                                        <p>{item.nombre}</p>
+                                        <small className="text-muted">Talla: {item.talla}</small>
+                                        <br />
+                                        <small className="text-muted">Cantidad: {item.quantity}</small> {/* Nueva línea */}
+                                    </div>
                                 </div>
-                                <span className="badge bg-primary rounded-pill">${item.precio}</span>
+                                <span className="badge bg-primary rounded-pill">
+                                    ${item.precio * item.quantity} {/* Precio multiplicado por la cantidad */}
+                                </span>
                             </li>
                         ))}
                     </ul>
                     <h4 className="mt-3">Total: ${total}</h4>
-
-                    {/* Formulario de tarjeta (no se usará para compra, solo para marcar como pendiente) */}
-                    <button className="btn btn-success w-100" onClick={handlePurchase}>Continuar con la compra</button>
+                    <button className="btn btn-success w-100" onClick={handlePurchase} disabled={isProcessing}>
+                        {isProcessing ? 'Procesando...' : 'Continuar con la compra'}
+                    </button>
                 </div>
+
             </div>
         </div>
     );

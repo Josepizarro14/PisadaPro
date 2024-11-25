@@ -101,6 +101,10 @@ def checkout():
 
         total = 0
         for producto in data['productos']:
+            # Validar que la talla esté presente en el producto
+            if not producto.get('talla'):
+                return jsonify({"error": f"Falta la talla para el producto {producto.get('nombre_zapatilla', 'sin nombre')}"}), 400
+            
             detalle = DetalleCompra(
                 compra_id=compra.id,
                 nombre_zapatilla=producto['nombre_zapatilla'],
@@ -108,11 +112,13 @@ def checkout():
                 precio=producto['precio'],
                 cantidad=producto['cantidad'],
                 imagen=producto['imagen'],
+                talla=producto['talla']  # Nueva asignación de talla
             )
             db.session.add(detalle)
             total += producto['precio'] * producto['cantidad']
             print("Detalle agregado:", detalle.to_dict())
 
+        # Actualizar el total de la compra
         compra.total = total
         db.session.commit()
         print("Compra guardada en la base de datos.")
@@ -122,6 +128,7 @@ def checkout():
         db.session.rollback()
         print("Error durante el checkout:", e)
         return jsonify({"error": "Error en el servidor. Intente nuevamente."}), 500
+
 
 
 
@@ -274,6 +281,7 @@ def payment_return():
         # Redirigir al frontend con error general
         return redirect(f'http://localhost:3000/order-failure?error={str(e)}')
     
+    
 @cart_bp.route('/get-order-details/<int:order_id>', methods=['GET'])
 def get_order_details(order_id):
     try:
@@ -290,6 +298,7 @@ def get_order_details(order_id):
             "precio": detalle.precio,
             "cantidad": detalle.cantidad,
             "imagen": detalle.imagen,
+            "talla": detalle.talla  # Incluir la talla en los detalles
         } for detalle in compra.detalles]
 
         # Retornar los detalles de la compra incluyendo los productos
@@ -305,3 +314,4 @@ def get_order_details(order_id):
     except Exception as e:
         # Manejar cualquier error inesperado
         return jsonify({"error": f"Hubo un problema al obtener los detalles de la compra: {str(e)}"}), 500
+

@@ -1,4 +1,3 @@
-// ConfirmPayment.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
@@ -16,6 +15,7 @@ const ConfirmPayment = () => {
     const [expiryDate, setExpiryDate] = useState('');
     const [cvv, setCvv] = useState('');
     const [cardError, setCardError] = useState('');
+    const [tallas, setTallas] = useState({}); // Estado para las tallas
 
     const purchaseData = location.state?.purchaseData;
 
@@ -26,6 +26,13 @@ const ConfirmPayment = () => {
         } else {
             console.log("Datos recibidos para la confirmación:", purchaseData);
             setTotal(purchaseData.total);
+
+            // Inicializar el estado de tallas
+            const initialTallas = {};
+            purchaseData.productos.forEach((producto) => {
+                initialTallas[producto.id] = ''; // Cada producto comienza sin talla seleccionada
+            });
+            setTallas(initialTallas);
         }
     }, [purchaseData, navigate]);
 
@@ -45,6 +52,13 @@ const ConfirmPayment = () => {
     };
 
     const handleConfirmPayment = async () => {
+        // Validar tallas seleccionadas
+        const tallasFaltantes = Object.values(tallas).some((talla) => talla === '');
+        if (tallasFaltantes) {
+            setError('Por favor, selecciona una talla para cada producto.');
+            return;
+        }
+
         // Validar tarjeta
         if (!validateCardNumber(cardNumber)) {
             setCardError('El número de tarjeta no es válido.');
@@ -59,9 +73,12 @@ const ConfirmPayment = () => {
         setCardError(''); // Limpiar errores
 
         try {
-            // 1. Solicitar la creación de una transacción de pago en el backend
             const response = await cartApi.post('/pay', {
                 cliente_email: purchaseData.cliente_email,
+                productos: purchaseData.productos.map((producto) => ({
+                    ...producto,
+                    talla: tallas[producto.id],
+                })),
                 tarjeta_credito: {
                     numero: cardNumber,
                     fecha_expiracion: expiryDate,
@@ -72,7 +89,6 @@ const ConfirmPayment = () => {
             const { url, token } = response.data;
 
             if (url && token) {
-                // 2. Redirigir a Transbank para completar el pago
                 window.location.href = `${url}?token_ws=${token}`;
             } else {
                 setError('Hubo un problema al generar la transacción de pago.');
@@ -81,6 +97,13 @@ const ConfirmPayment = () => {
             console.error(error);
             setError('Error al iniciar el proceso de pago.');
         }
+    };
+
+    const handleTallaChange = (productId, talla) => {
+        setTallas((prevTallas) => ({
+            ...prevTallas,
+            [productId]: talla,
+        }));
     };
 
     return (
@@ -95,12 +118,29 @@ const ConfirmPayment = () => {
                     <div className="card p-4">
                         <ul className="list-group">
                             {purchaseData?.productos.map((item, index) => (
-                                <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                                    <div className="d-flex align-items-center">
-                                        <img src={item.imagen} alt={item.nombre_zapatilla} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
-                                        {item.nombre_zapatilla}
+                                <li key={index} className="list-group-item">
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div className="d-flex align-items-center">
+                                            <img src={item.imagen} alt={item.nombre_zapatilla} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
+                                            {item.nombre_zapatilla}
+                                        </div>
+                                        <span className="badge bg-primary rounded-pill">${item.precio}</span>
                                     </div>
-                                    <span className="badge bg-primary rounded-pill">${item.precio}</span>
+                                    <div className="mt-2">
+                                        <label className="form-label">Talla</label>
+                                        <select
+                                            className="form-select"
+                                            value={tallas[item.id] || ''}
+                                            onChange={(e) => handleTallaChange(item.id, e.target.value)}
+                                        >
+                                            <option value="">Selecciona una talla</option>
+                                            {item.tallas_disponibles.map((talla) => (
+                                                <option key={talla} value={talla}>
+                                                    {talla}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </li>
                             ))}
                         </ul>

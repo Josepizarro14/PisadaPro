@@ -67,13 +67,13 @@ const OrderSuccess = () => {
                                             <p>{producto.descripcion}</p>
                                             <p><strong>Precio:</strong> ${producto.precio}</p>
                                             <p><strong>Cantidad:</strong> {producto.cantidad}</p>
+                                            <p><strong>Talla:</strong> {producto.talla}</p> {/* Mostrar la talla */}
                                         </div>
                                     ))
                                 ) : (
                                     <p>No se encontraron productos en tu compra.</p>
                                 )}
                             </div>
-
 
                             <button className="btn btn-primary" onClick={handleRedirectHome}>
                                 Volver al inicio
