@@ -1,7 +1,9 @@
+// ConfirmPayment.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { FaShoppingCart, FaCreditCard } from 'react-icons/fa';
+import { userApi, cartApi } from '../services/api'; // API para obtener datos del usuario y carrito
 
 const ConfirmPayment = () => {
     const navigate = useNavigate();
@@ -10,28 +12,74 @@ const ConfirmPayment = () => {
     const [total, setTotal] = useState(0);
     const [confirmationMessage, setConfirmationMessage] = useState('');
     const [error, setError] = useState('');
+    const [cardNumber, setCardNumber] = useState('');
+    const [expiryDate, setExpiryDate] = useState('');
+    const [cvv, setCvv] = useState('');
+    const [cardError, setCardError] = useState('');
 
     const purchaseData = location.state?.purchaseData;
 
     useEffect(() => {
-        if (!purchaseData) {
-            navigate('/checkout');  // Redirigir si no hay datos de compra
+        if (!purchaseData || !purchaseData.productos) {
+            console.error("No se recibieron datos de compra.");
+            navigate('/checkout'); // Redirige si no hay datos
         } else {
+            console.log("Datos recibidos para la confirmación:", purchaseData);
             setTotal(purchaseData.total);
         }
     }, [purchaseData, navigate]);
 
+    // Validación del número de tarjeta (algoritmo de Luhn)
+    const validateCardNumber = (number) => {
+        let sum = 0;
+        let shouldDouble = false;
+        for (let i = number.length - 1; i >= 0; i--) {
+            let digit = parseInt(number.charAt(i));
+            if (shouldDouble) {
+                if ((digit *= 2) > 9) digit -= 9;
+            }
+            sum += digit;
+            shouldDouble = !shouldDouble;
+        }
+        return sum % 10 === 0;
+    };
+
     const handleConfirmPayment = async () => {
+        // Validar tarjeta
+        if (!validateCardNumber(cardNumber)) {
+            setCardError('El número de tarjeta no es válido.');
+            return;
+        }
+
+        if (!expiryDate || !cvv) {
+            setCardError('Por favor, ingrese la fecha de expiración y el CVV.');
+            return;
+        }
+
+        setCardError(''); // Limpiar errores
+
         try {
-            // Aquí iría la lógica para procesar el pago con la API de Transbank o el backend
-            setConfirmationMessage('¡Pago realizado con éxito! Gracias por tu compra.');
-            clearCart();  // Limpiar el carrito después de la compra
-            setTimeout(() => {
-                navigate('/order-success');
-            }, 3000);
+            // 1. Solicitar la creación de una transacción de pago en el backend
+            const response = await cartApi.post('/pay', {
+                cliente_email: purchaseData.cliente_email,
+                tarjeta_credito: {
+                    numero: cardNumber,
+                    fecha_expiracion: expiryDate,
+                    cvv: cvv,
+                },
+            }, { withCredentials: true });
+
+            const { url, token } = response.data;
+
+            if (url && token) {
+                // 2. Redirigir a Transbank para completar el pago
+                window.location.href = `${url}?token_ws=${token}`;
+            } else {
+                setError('Hubo un problema al generar la transacción de pago.');
+            }
         } catch (error) {
             console.error(error);
-            setError('Error al procesar el pago.');
+            setError('Error al iniciar el proceso de pago.');
         }
     };
 
@@ -63,14 +111,49 @@ const ConfirmPayment = () => {
                 <div className="col-md-6">
                     <h4 className="mb-3">Método de Pago</h4>
                     <div className="card p-4">
+                        {/* Campo para ingresar número de tarjeta */}
                         <div className="mb-3">
-                            <label className="form-label">Tarjeta de Crédito</label>
-                            <div className="input-group">
-                                <span className="input-group-text"><FaCreditCard /></span>
-                                {/* Mostrar solo los últimos 4 dígitos de la tarjeta */}
-                                <input type="text" className="form-control" disabled value={`**** **** **** ${purchaseData?.tarjeta_credito.numero.slice(-4)}`} />
-                            </div>
+                            <label className="form-label">Número de Tarjeta</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={cardNumber}
+                                onChange={(e) => setCardNumber(e.target.value)}
+                                maxLength="16"
+                                placeholder="Ingresa el número de tarjeta"
+                                required
+                            />
                         </div>
+
+                        {/* Campo para ingresar fecha de expiración */}
+                        <div className="mb-3">
+                            <label className="form-label">Fecha de Expiración</label>
+                            <input
+                                type="month"
+                                className="form-control"
+                                value={expiryDate}
+                                onChange={(e) => setExpiryDate(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        {/* Campo para ingresar CVV */}
+                        <div className="mb-3">
+                            <label className="form-label">CVV</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={cvv}
+                                onChange={(e) => setCvv(e.target.value)}
+                                maxLength="3"
+                                placeholder="Ingresa el CVV"
+                                required
+                            />
+                        </div>
+
+                        {/* Mostrar error de validación de tarjeta */}
+                        {cardError && <div className="alert alert-danger">{cardError}</div>}
+
                         <button className="btn btn-success w-100" onClick={handleConfirmPayment}>Confirmar Pago</button>
                     </div>
                 </div>
@@ -78,6 +161,5 @@ const ConfirmPayment = () => {
         </div>
     );
 };
-
 
 export default ConfirmPayment;

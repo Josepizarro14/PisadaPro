@@ -3,7 +3,6 @@ from flask import Blueprint, request, jsonify
 from app.models import db, Compra, DetalleCompra, Cliente  # Asegúrate de importar el modelo Cliente
 from transbank.webpay.webpay_plus.transaction import Transaction
 cart_bp = Blueprint('cart', __name__)
-
 # Ruta para obtener los productos en el carrito
 @cart_bp.route('/items', methods=['GET'])
 def get_cart_items():
@@ -57,33 +56,36 @@ def add_to_cart():
 @cart_bp.route('/checkout', methods=['POST'])
 def checkout():
     data = request.json
-    cliente_email = data.get('cliente_email')
-    productos = data.get('productos', [])
-    print("Datos recibidos:", data)
-
-    if not productos:
+    print("Inicio del proceso de checkout. Datos recibidos:", data)
+    
+    # Verificar datos básicos
+    if not data.get('productos', []):
         return jsonify({"error": "Debe haber productos en el carrito"}), 400
-
+    
     try:
-        cliente = Cliente.query.filter_by(email=cliente_email).first()
+        # Verificar que los datos se reciben correctamente solo una vez
+        print("Recibido el pedido:", data)
+        
+        # Buscar o crear cliente
+        cliente = Cliente.query.filter_by(email=data.get('cliente_email')).first()
         if not cliente:
+            print("Cliente no encontrado, creando uno nuevo...")
             cliente = Cliente(
                 rut_persona=data.get('rut_cliente', 'sin-rut'),
-                email=cliente_email,
+                email=data.get('cliente_email'),
                 nombre=data.get('nombre_cliente', 'Cliente'),
-                apellido=data.get('apellido_cliente', 'Invitado'),
                 direccion=data.get('direccion_cliente', 'Sin dirección'),
                 comuna=data.get('comuna_cliente', 'Sin comuna'),
                 region=data.get('region_cliente', 'Sin región'),
                 telefono=data.get('telefono_cliente', 'Sin teléfono'),
-                rol='invitado'
             )
             db.session.add(cliente)
             db.session.flush()
+            print("Cliente creado:", cliente.to_dict())
 
-        # Crear compra con datos del cliente
+        # Crear la compra pero con estado pendiente
         compra = Compra(
-            cliente_email=cliente_email,
+            cliente_email=data['cliente_email'],
             fecha=datetime.utcnow(),
             total=0,
             estado='pendiente',
@@ -91,34 +93,38 @@ def checkout():
             direccion_cliente=cliente.direccion,
             comuna_cliente=cliente.comuna,
             region_cliente=cliente.region,
-            telefono_cliente=cliente.telefono
+            telefono_cliente=cliente.telefono,
         )
         db.session.add(compra)
         db.session.flush()
+        print("Compra creada con ID:", compra.id)
 
         total = 0
-        for producto in productos:
-            nuevo_item = DetalleCompra(
+        for producto in data['productos']:
+            detalle = DetalleCompra(
                 compra_id=compra.id,
                 nombre_zapatilla=producto['nombre_zapatilla'],
                 descripcion=producto['descripcion'],
                 precio=producto['precio'],
                 cantidad=producto['cantidad'],
-                imagen=producto['imagen']
+                imagen=producto['imagen'],
             )
-            db.session.add(nuevo_item)
+            db.session.add(detalle)
             total += producto['precio'] * producto['cantidad']
+            print("Detalle agregado:", detalle.to_dict())
 
         compra.total = total
-        compra.estado = 'finalizada'
         db.session.commit()
-
-        return jsonify({"message": "Compra realizada con éxito", "compra": compra.to_dict()}), 201
-
+        print("Compra guardada en la base de datos.")
+        return jsonify({"message": "Compra registrada con éxito. Esperando pago", "compra": compra.to_dict()}), 201
+    
     except Exception as e:
         db.session.rollback()
-        print(f"Error en el endpoint /checkout: {e}")
-        return jsonify({"error": str(e)}), 500
+        print("Error durante el checkout:", e)
+        return jsonify({"error": "Error en el servidor. Intente nuevamente."}), 500
+
+
+
 
 
 
@@ -199,11 +205,14 @@ def initiate_payment():
             buy_order=str(compra.id),
             session_id=cliente_email,
             amount=compra.total,
-            return_url='https://tusitio.com/cart/confirm'  # URL para confirmar el pago
+            return_url='http://localhost:5003/cart/payment-return'  # URL de retorno
         )
+        print("Transacción iniciada con éxito, respuesta:", response)  # Log para ver la respuesta
         return jsonify({"url": response['url'], "token": response['token']})
     except Exception as e:
+        print(f"Error al crear la transacción: {str(e)}")  # Log del error
         return jsonify({"error": f"Error al iniciar el pago: {str(e)}"}), 500
+
 
 @cart_bp.route('/confirm', methods=['POST'])
 def confirm_payment():
@@ -211,18 +220,88 @@ def confirm_payment():
     if not token:
         return jsonify({"error": "Token no recibido"}), 400
 
-    # Confirmar transacción con Transbank
     try:
         transaction = Transaction()
         response = transaction.commit(token)
+
         if response['status'] == 'AUTHORIZED':
             # Actualizar estado de la compra
             compra = Compra.query.get(int(response['buy_order']))
             compra.estado = 'pagada'
             db.session.commit()
-            return jsonify({"message": "Pago confirmado", "compra": compra.to_dict()})
+            return jsonify({"message": "Pago confirmado", "compra": compra.to_dict()}), 200
         else:
             return jsonify({"error": "Transacción no autorizada", "details": response}), 400
     except Exception as e:
         return jsonify({"error": f"Error al confirmar el pago: {str(e)}"}), 500
 
+from flask import redirect
+
+@cart_bp.route('/payment-return', methods=['POST', 'GET'])
+def payment_return():
+    token = request.args.get('token_ws')  # O `request.json` si usas POST
+    if not token:
+        return jsonify({"error": "Token no recibido"}), 400
+
+    try:
+        # Validar la transacción con Transbank
+        transaction = Transaction()
+        response = transaction.commit(token)
+
+        if response.get('status') == 'AUTHORIZED':
+            compra_id = int(response.get('buy_order', 0))
+            compra = Compra.query.get(compra_id)
+
+            if not compra:
+                return jsonify({"error": "Compra no encontrada"}), 404
+
+            # Validar el monto
+            if float(compra.total) != float(response.get('amount', 0)):
+                return jsonify({"error": "El monto de la transacción no coincide con la compra"}), 400
+
+            # Cambiar el estado de la compra
+            compra.estado = 'pagada'
+            db.session.commit()
+
+            # Redirigir al frontend con éxito
+            return redirect(f'http://localhost:3000/order-success?order_id={compra.id}')
+
+        else:
+            # Si no autorizado, redirigir con error
+            return redirect(f'http://localhost:3000/order-failure?error=pago_no_autorizado')
+
+    except Exception as e:
+        # Redirigir al frontend con error general
+        return redirect(f'http://localhost:3000/order-failure?error={str(e)}')
+    
+@cart_bp.route('/get-order-details/<int:order_id>', methods=['GET'])
+def get_order_details(order_id):
+    try:
+        # Buscar la compra en la base de datos por su ID
+        compra = Compra.query.get(order_id)
+
+        if not compra:
+            return jsonify({"error": "Compra no encontrada"}), 404
+
+        # Obtener los detalles de los productos (detalles de la compra)
+        detalles = [{
+            "nombre_zapatilla": detalle.nombre_zapatilla,
+            "descripcion": detalle.descripcion,
+            "precio": detalle.precio,
+            "cantidad": detalle.cantidad,
+            "imagen": detalle.imagen,
+        } for detalle in compra.detalles]
+
+        # Retornar los detalles de la compra incluyendo los productos
+        return jsonify({
+            "id": compra.id,
+            "cliente_email": compra.cliente_email,
+            "estado": compra.estado,
+            "total": compra.total,
+            "fecha": compra.fecha.strftime('%Y-%m-%d %H:%M:%S'),  # Formato de la fecha
+            "productos": detalles  # Incluir los productos con sus detalles
+        }), 200
+
+    except Exception as e:
+        # Manejar cualquier error inesperado
+        return jsonify({"error": f"Hubo un problema al obtener los detalles de la compra: {str(e)}"}), 500

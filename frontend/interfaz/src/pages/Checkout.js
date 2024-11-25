@@ -24,6 +24,7 @@ const Checkout = () => {
     const { cartItems, clearCart } = useCart();
     const navigate = useNavigate();
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -74,49 +75,57 @@ const Checkout = () => {
     };
 
     const handlePurchase = async () => {
-        if (!validateCardNumber(cardNumber)) {
-            setCardError('El número de tarjeta no es válido.');
-            return;
+    if (isProcessing) return; // Prevenir que se envíen múltiples solicitudes
+
+    setIsProcessing(true); // Bloquear la función para que no se ejecute nuevamente
+
+    if (!validateCardNumber(cardNumber)) {
+        setCardError('El número de tarjeta no es válido.');
+        setIsProcessing(false); // Volver a habilitar el botón si hay error
+        return;
+    }
+    setCardError('');
+
+    try {
+        const purchaseData = {
+            cliente_email: userData.email,
+            productos: cartItems.map(item => ({
+                nombre_zapatilla: item.nombre,
+                descripcion: item.descripcion,
+                precio: item.precio,
+                cantidad: item.quantity,
+                imagen: item.imagen,
+            })),
+            total,
+            fecha: new Date().toISOString(),
+            rut_cliente: userData.rut_persona,
+            nombre_cliente: userData.nombre,
+            direccion_cliente: userData.direccion,
+            comuna_cliente: userData.comuna,
+            region_cliente: userData.region,
+            telefono_cliente: userData.telefono,
+            estado: 'pendiente',
+        };
+
+        // Hacer la llamada al backend para guardar el pedido como pendiente
+        const response = await cartApi.post('/checkout', purchaseData);
+
+        if (response.status === 201) {
+            setSuccessMessage('Compra guardada como pendiente.');
+            clearCart(); // Limpiar el carrito después de guardar el pedido
+            // Redirigir al usuario a la página de confirmación de pago con los datos de compra
+            navigate('/confirm-payment', { state: { purchaseData } });
+        } else {
+            setError('Error al procesar la compra.');
         }
-        setCardError('');
-
-        try {
-            const purchaseData = {
-                cliente_email: userData.email,
-                productos: cartItems.map(item => ({
-                    nombre_zapatilla: item.nombre,
-                    descripcion: item.descripcion,
-                    precio: item.precio,
-                    categoria: item.categoria,
-                    cantidad: item.quantity,
-                    imagen: item.imagen,
-                })),
-                total,
-                fecha: new Date().toISOString(),
-                rut_cliente: userData.rut_persona,
-                nombre_cliente: userData.nombre,
-                direccion_cliente: userData.direccion,
-                comuna_cliente: userData.comuna,
-                region_cliente: userData.region,
-                telefono_cliente: userData.telefono,
-                tarjeta_credito: {
-                    numero: cardNumber,
-                    vencimiento: expiryDate,
-                    cvv: cvv,
-                },
-            };
-
-            // Redirige a la página de confirmación de pago con los datos de la compra
-            setTimeout(() => {
-                navigate('/confirm-payment', { state: { purchaseData } });
-            }, 3000);
-
-        } catch (error) {
-            console.error(error);
-            setError('Error al realizar la compra.');
-        }
-    };
-
+    } catch (error) {
+        console.error(error);
+        setError('Error al realizar la compra.');
+    } finally {
+        setIsProcessing(false); // Volver a habilitar el botón después de que termine la solicitud
+    }
+};
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -231,41 +240,8 @@ const Checkout = () => {
                     </ul>
                     <h4 className="mt-3">Total: ${total}</h4>
 
-                    {/* Formulario de tarjeta */}
-                    <div className="mb-3">
-                        <label className="form-label">Número de Tarjeta</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={cardNumber}
-                            onChange={(e) => setCardNumber(e.target.value)}
-                            maxLength="16"
-                            required
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Fecha de Vencimiento</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={expiryDate}
-                            onChange={(e) => setExpiryDate(e.target.value)}
-                            placeholder="MM/AA"
-                            required
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">CVV</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={cvv}
-                            onChange={(e) => setCvv(e.target.value)}
-                            maxLength="3"
-                            required
-                        />
-                    </div>
-                    <button className="btn btn-success w-100" onClick={handlePurchase}>Realizar Compra</button>
+                    {/* Formulario de tarjeta (no se usará para compra, solo para marcar como pendiente) */}
+                    <button className="btn btn-success w-100" onClick={handlePurchase}>Continuar con la compra</button>
                 </div>
             </div>
         </div>
