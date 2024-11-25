@@ -1,9 +1,10 @@
 # app/__init__.py
-from flask import Flask
+from flask import Flask, session
 from .database import db, init_db
 from .models import Cliente
 from flask_login import LoginManager
 from flask_cors import CORS
+from datetime import timedelta
 
 def create_app():
     app = Flask(__name__)
@@ -11,6 +12,8 @@ def create_app():
     CORS(app, supports_credentials=True)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@user-db:5432/pisadaprodb_users'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SESSION_COOKIE_NAME'] = 'your_session_cookie_name'
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)  # Ajusta el tiempo de vida de la sesión
     app.secret_key = 'appweb'  # Cambia esto a una clave más segura
 
     # Inicializar base de datos
@@ -28,6 +31,11 @@ def create_app():
     @login_manager.user_loader
     def load_user(email):  # Cambiado a email
         return Cliente.query.filter_by(email=email).first()  # Ahora usa email
+    
+    @app.before_request
+    def make_session_permanent():
+        session.permanent = True
+
 
     with app.app_context():
         try:
