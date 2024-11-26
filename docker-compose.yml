@@ -118,8 +118,8 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"     # Puerto para comunicación
-      - "15672:15672"   # Interfaz de administración web
+      - "5673:5672"     # Puerto para comunicación
+      - "15673:15672"   # Interfaz de administración web
 
 volumes:
   user_postgres_data:

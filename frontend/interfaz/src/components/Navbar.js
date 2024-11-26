@@ -62,7 +62,16 @@ const Navbar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-custom">
             <div className="container">
-                <Link className="navbar-brand" to="/">PisadaPro</Link>
+            <Link className="navbar-brand d-flex align-items-center" to="/">
+    <img 
+        src="assets/images/icono.png" 
+        alt="PisadaPro Icon" 
+        className="me-2" 
+        style={{ height: '40px', width: 'auto' }} // Ajusta el tamaño según tus necesidades
+    />
+    <span>PisadaPro</span>
+</Link>
+
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span className="navbar-toggler-icon"></span>
                 </button>
