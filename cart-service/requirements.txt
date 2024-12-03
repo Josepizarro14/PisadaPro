@@ -8,3 +8,4 @@ blueprint
 flask_migrate
 transbank-sdk==5.0.0
 python-dotenv
+pika
