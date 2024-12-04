@@ -25,7 +25,7 @@ const HistorialCompras = () => {
       setCompras(response.data.compras);
       setLoading(false);
     } catch (err) {
-      setError('No se pudo obtener el historial de compras.');
+      //setError('No se pudo obtener el historial de compras.');
       setLoading(false);
     }
   };
