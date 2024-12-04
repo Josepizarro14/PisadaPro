@@ -8,6 +8,8 @@ const Checkout = () => {
     const [userData, setUserData] = useState({
         nombre: '',
         direccion: '',
+        rut_cliente: '',
+        apellido: '',
         comuna: '',
         region: '',
         email: '',
@@ -28,9 +30,12 @@ const Checkout = () => {
             const fetchUserData = async () => {
                 try {
                     const response = await userApi.get('/userCheckout');
+                    console.log(response.data); // Depura aquí para ver la respuesta completa
                     setUserData({
                         nombre: response.data.nombre,
+                        apellido: response.data.apellido,
                         direccion: response.data.direccion,
+                        rut_cliente: response.data.rut_persona,
                         comuna: response.data.comuna,
                         region: response.data.region,
                         email: response.data.email,
@@ -74,11 +79,12 @@ const Checkout = () => {
                 })),
                 total,
                 fecha: new Date().toISOString(),
-                rut_cliente: userData.rut_persona,
+                rut_cliente: userData.rut_cliente,
                 nombre_cliente: userData.nombre,
                 direccion_cliente: userData.direccion,
                 comuna_cliente: userData.comuna,
                 region_cliente: userData.region,
+                rol_cliente: userData.rol,
                 telefono_cliente: userData.telefono,
                 estado: 'pendiente',
             };

@@ -71,32 +71,30 @@ def checkout():
     data = request.json
     print("Inicio del proceso de checkout. Datos recibidos:", data)
     
-    # Verificar datos básicos
-    if not data.get('productos', []):
-        return jsonify({"error": "Debe haber productos en el carrito"}), 400
+    # Validar los datos básicos
+    if not data.get('cliente_email') or not data.get('productos'):
+        return jsonify({"error": "El correo del cliente y los productos son obligatorios"}), 400
     
     try:
-        # Verificar que los datos se reciben correctamente solo una vez
-        print("Recibido el pedido:", data)
-        
-        # Buscar o crear cliente
-        cliente = Cliente.query.filter_by(email=data.get('cliente_email')).first()
+        # Buscar o crear el cliente
+        cliente = Cliente.query.filter_by(email=data['cliente_email']).first()
         if not cliente:
             print("Cliente no encontrado, creando uno nuevo...")
             cliente = Cliente(
-                rut_persona=data.get('rut_cliente', 'sin-rut'),
                 email=data.get('cliente_email'),
                 nombre=data.get('nombre_cliente', 'Cliente'),
                 direccion=data.get('direccion_cliente', 'Sin dirección'),
+                rut_persona=data.get('rut_cliente', 'sin-rut'),
+                rol=data.get('rol_cliente', 'invitado'),
                 comuna=data.get('comuna_cliente', 'Sin comuna'),
                 region=data.get('region_cliente', 'Sin región'),
                 telefono=data.get('telefono_cliente', 'Sin teléfono'),
             )
             db.session.add(cliente)
-            db.session.flush()
-            print("Cliente creado:", cliente.to_dict())
+            db.session.flush()  # Generar ID para el cliente
+            print("Cliente creado:", cliente.email)
 
-        # Crear la compra pero con estado pendiente
+        # Crear la compra
         compra = Compra(
             cliente_email=data['cliente_email'],
             fecha=datetime.utcnow(),
@@ -109,38 +107,40 @@ def checkout():
             telefono_cliente=cliente.telefono,
         )
         db.session.add(compra)
-        db.session.flush()
+        db.session.flush()  # Generar ID para la compra
         print("Compra creada con ID:", compra.id)
 
         total = 0
         for producto in data['productos']:
-            # Validar que la talla esté presente en el producto
-            if not producto.get('talla'):
-                return jsonify({"error": f"Falta la talla para el producto {producto.get('nombre_zapatilla', 'sin nombre')}"}), 400
-            
+            # Validar campos obligatorios en el producto
+            if not producto.get('nombre_zapatilla') or not producto.get('precio') or not producto.get('cantidad') or not producto.get('talla'):
+                return jsonify({"error": f"Datos incompletos para el producto {producto}"}), 400
+
+            # Crear el detalle de la compra
             detalle = DetalleCompra(
                 compra_id=compra.id,
                 nombre_zapatilla=producto['nombre_zapatilla'],
-                descripcion=producto['descripcion'],
+                descripcion=producto.get('descripcion', ''),
                 precio=producto['precio'],
                 cantidad=producto['cantidad'],
-                imagen=producto['imagen'],
-                talla=producto['talla']  # Nueva asignación de talla
+                imagen=producto.get('imagen', ''),
+                talla=producto['talla'],
             )
             db.session.add(detalle)
             total += producto['precio'] * producto['cantidad']
-            print("Detalle agregado:", detalle.to_dict())
+            print("Detalle agregado:", detalle.nombre_zapatilla)
 
         # Actualizar el total de la compra
         compra.total = total
         db.session.commit()
-        print("Compra guardada en la base de datos.")
-        return jsonify({"message": "Compra registrada con éxito. Esperando pago", "compra": compra.to_dict()}), 201
-    
+        print("Compra guardada con éxito en la base de datos.")
+        return jsonify({"message": "Compra registrada con éxito", "compra": compra.to_dict()}), 201
+
     except Exception as e:
         db.session.rollback()
-        print("Error durante el checkout:", e)
-        return jsonify({"error": "Error en el servidor. Intente nuevamente."}), 500
+        print("Error durante el proceso de checkout:", e)
+        return jsonify({"error": "Ocurrió un problema durante el proceso de compra."}), 500
+
 
 
 
@@ -357,3 +357,45 @@ def get_order_details(order_id):
         # Manejar cualquier error inesperado
         return jsonify({"error": f"Hubo un problema al obtener los detalles de la compra: {str(e)}"}), 500
 
+@cart_bp.route('/compras/<email>', methods=['GET'])
+def obtener_compras_por_cliente(email):
+    try:
+        # Buscar el cliente por email
+        cliente = Cliente.query.filter_by(email=email).first()
+        if not cliente:
+            return jsonify({"error": f"No se encontró un cliente con email {email}"}), 404
+
+        # Obtener las compras del cliente
+        compras = Compra.query.filter_by(cliente_email=cliente.email).all()
+
+        # Formatear la respuesta
+        resultado = {
+            "cliente": cliente.to_dict(),
+            "compras": [compra.to_dict() for compra in compras]
+        }
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@cart_bp.route('/compras', methods=['GET'])
+def obtener_todas_las_compras():
+    try:
+        # Obtener todas las compras de la base de datos
+        compras = Compra.query.all()
+
+        # Formatear el resultado con los detalles del cliente
+        resultado = []
+        for compra in compras:
+            cliente = Cliente.query.filter_by(email=compra.cliente_email).first()
+            resultado.append({
+                "compra": compra.to_dict(),
+                "cliente": cliente.to_dict() if cliente else None
+            })
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
