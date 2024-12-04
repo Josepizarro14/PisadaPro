@@ -2,7 +2,20 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 from app.models import db, Compra, DetalleCompra, Cliente  # Asegúrate de importar el modelo Cliente
 from transbank.webpay.webpay_plus.transaction import Transaction
+import pymongo
 cart_bp = Blueprint('cart', __name__)
+
+MONGO_URL = "mongodb://product-db:27017/pisadapro_products"
+mongo_client = pymongo.MongoClient(MONGO_URL)
+mongo_db = mongo_client.get_database()
+products_collection = mongo_db.get_collection("products")
+
+
+CATALOG_MONGO_URL = "mongodb://catalog-db:27017/pisadapro_catalogs"
+catalog_client = pymongo.MongoClient(CATALOG_MONGO_URL)
+catalog_db = catalog_client.get_database()
+catalog_collection = catalog_db.get_collection("products")
+
 # Ruta para obtener los productos en el carrito
 @cart_bp.route('/items', methods=['GET'])
 def get_cart_items():
@@ -265,6 +278,35 @@ def payment_return():
             # Validar el monto
             if float(compra.total) != float(response.get('amount', 0)):
                 return jsonify({"error": "El monto de la transacción no coincide con la compra"}), 400
+
+            # Descontar el stock
+            for detalle in compra.detalles:
+                product = products_collection.find_one({"nombre": detalle.nombre_zapatilla})
+                if not product:
+                    return jsonify({"error": f"Producto '{detalle.nombre_zapatilla}' no encontrado"}), 404
+
+                talla = detalle.talla
+                cantidad = detalle.cantidad
+
+                # Verificar si existe suficiente stock para la talla
+                stock_actual = product.get("stockPorTalla", {}).get(talla, 0)
+                if stock_actual < cantidad:
+                    return jsonify({"error": f"Stock insuficiente para la talla {talla} del producto '{detalle.nombre_zapatilla}'"}), 400
+
+                # Descontar el stock
+                products_collection.update_one(
+                    {"_id": product["_id"]},
+                    {"$inc": {f"stockPorTalla.{talla}": -cantidad}}
+                )
+
+                catalog_product = catalog_collection.find_one({"nombre": detalle.nombre_zapatilla})
+                if not catalog_product:
+                    return jsonify({"error": f"Producto '{detalle.nombre_zapatilla}' no encontrado en el catálogo"}), 404
+
+                catalog_collection.update_one(
+                    {"_id": catalog_product["_id"]},
+                    {"$inc": {f"stockPorTalla.{talla}": -cantidad}}
+                )
 
             # Cambiar el estado de la compra
             compra.estado = 'pagada'
