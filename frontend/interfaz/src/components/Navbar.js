@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; 
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useCart } from '../contexts/CartContext';
@@ -12,11 +12,12 @@ const Navbar = () => {
     const userRole = localStorage.getItem('userRole');
     const navigate = useNavigate();
     const [showCartDropdown, setShowCartDropdown] = useState(false);
-    const [cartTotal, setCartTotal] = useState(0); // Estado para el total del carrito
+    const [cartTotal, setCartTotal] = useState(0);
     const dropdownRef = useRef(null);
+    const [productStock, setProductStock] = useState({}); // Almacenar el stock de los productos
 
+    // Calcular el total del carrito cada vez que cambian los elementos
     useEffect(() => {
-        // Calcular el total del carrito cada vez que cambian los elementos
         const calculateTotal = () => {
             const total = cartItems.reduce((sum, item) => sum + item.precio * item.quantity, 0);
             setCartTotal(total);
@@ -25,10 +26,11 @@ const Navbar = () => {
         calculateTotal();
     }, [cartItems]);
 
+    // Cerrar el carrito si se hace clic fuera de él
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowCartDropdown(false); // Cierra el carrito si se hace clic fuera
+                setShowCartDropdown(false);
             }
         };
 
@@ -36,6 +38,8 @@ const Navbar = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+
+    // Manejo de la sesión
     const handleLogout = async () => {
         if (isAuthenticated) {
             try {
@@ -53,10 +57,12 @@ const Navbar = () => {
         }
     };
 
+    // Alternar el carrito desplegable
     const toggleCartDropdown = () => setShowCartDropdown(!showCartDropdown);
 
-    const handleRemoveItem = (itemId) => {
-        removeFromCart(itemId);
+    // Eliminar item del carrito
+    const handleRemoveItem = (itemId, talla) => {
+        removeFromCart(itemId, talla);
     };
 
     return (
@@ -101,11 +107,13 @@ const Navbar = () => {
                                                     <div className="cart-item-details">
                                                         <span>{item.nombre}</span>
                                                         <br />
+                                                        <small>Talla: {item.talla}</small>
+                                                        <br />
                                                         <small>Cantidad: {item.quantity}</small>
                                                     </div>
                                                     <button
                                                         className="btn btn-sm ms-auto"
-                                                        onClick={() => handleRemoveItem(item._id)}
+                                                        onClick={() => handleRemoveItem(item._id, item.talla)}
                                                     >
                                                         ❌
                                                     </button>

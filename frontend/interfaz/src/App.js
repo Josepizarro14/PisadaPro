@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
+import OrderHistory from './pages/OrderhHistory';
 import Register from './components/Register';
 import AdminPanel from './pages/AdminPanel'; // Importamos el nuevo componente
 import ProductManager from './components/ProductManager';
@@ -43,6 +44,7 @@ function App() {
                         <Route path='/product-manager' element={<ProductManager />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="*" element={<NotFound />} />
+                        <Route path="/order-history" element={<OrderHistory />} />
                         <Route path="/confirm-payment" element={<ConfirmPayment />} />
                         <Route path="/order-success" element={<OrderSuccess />} />
                         {/* Agrega más rutas aquí */}

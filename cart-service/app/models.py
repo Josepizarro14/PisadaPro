@@ -89,7 +89,6 @@ class Compra(db.Model):
         }
 
 
-
 # Tabla de Detalles de Compra
 class DetalleCompra(db.Model):
     __tablename__ = 'detalles_compra'
@@ -101,6 +100,7 @@ class DetalleCompra(db.Model):
     precio = db.Column(db.Float, nullable=False)
     cantidad = db.Column(db.Integer, nullable=False)
     imagen = db.Column(db.String(255), nullable=False)
+    talla = db.Column(db.String(10), nullable=False)  # Nuevo campo para tallas
 
     def to_dict(self):
         return {
@@ -110,5 +110,6 @@ class DetalleCompra(db.Model):
             "descripcion": self.descripcion,
             "precio": self.precio,
             "cantidad": self.cantidad,
-            "imagen": self.imagen
+            "imagen": self.imagen,
+            "talla": self.talla  # Incluir la talla en la salida del dict
         }

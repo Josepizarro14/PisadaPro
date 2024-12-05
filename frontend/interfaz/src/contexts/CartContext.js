@@ -16,24 +16,28 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
     }, [cartItems]);
 
+    // Agregar al carrito
     const addToCart = (product) => {
         setCartItems((prevItems) => {
-            const existingItem = prevItems.find(item => item._id === product._id);
-            if (existingItem) {
-                return prevItems.map(item =>
-                    item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
+            const existingProduct = prevItems.find(
+                (item) => item._id === product._id && item.talla === product.talla
+            );
+            if (existingProduct) {
+                return prevItems.map((item) =>
+                    item._id === product._id && item.talla === product.talla
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
                 );
-            } else {
-                return [...prevItems, { ...product, quantity: 1 }];
             }
+            return [...prevItems, { ...product, quantity: 1 }];
         });
     };
 
-    const removeFromCart = (itemId) => {
-        setCartItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
+    // Eliminar del carrito por id y talla
+    const removeFromCart = (itemId, talla) => {
+        setCartItems((prevItems) => prevItems.filter(item => !(item._id === itemId && item.talla === talla)));
     };
 
-    // Función para limpiar el carrito
     const clearCart = () => {
         setCartItems([]); // Establece el carrito vacío
         localStorage.removeItem('cartItems'); // Elimina el carrito del localStorage

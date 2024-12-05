@@ -98,7 +98,10 @@ const ConfirmPayment = () => {
                                 <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                                     <div className="d-flex align-items-center">
                                         <img src={item.imagen} alt={item.nombre_zapatilla} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
-                                        {item.nombre_zapatilla}
+                                        <div>
+                                            <strong>{item.nombre_zapatilla}</strong>
+                                            <small className="text-muted d-block">Talla: {item.talla}</small>
+                                        </div>
                                     </div>
                                     <span className="badge bg-primary rounded-pill">${item.precio}</span>
                                 </li>

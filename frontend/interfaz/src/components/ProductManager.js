@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productApi } from '../services/api';
+import '../styles/stylesProduct.css';
 
 const ProductManager = () => {
     const navigate = useNavigate();
@@ -10,15 +11,28 @@ const ProductManager = () => {
         descripcion: '',
         precio: '',
         categoria: '',
-        stock: '',
+        stockPorTalla: Object.fromEntries(Array.from({length: 16},(_,i) => [30 + i, 0])),
         imagen: ''
     });
     const [isEditing, setIsEditing] = useState(false);
     const [currentProductId, setCurrentProductId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage] = useState(4);  // Número de productos por página
-
+    const [showStockModal, setShowStockModal] = useState(false);
+    const [selectedProductStock, setSelectedProductStock] = useState({});
     // Verificar autenticación y rol de usuario
+    // Mostrar el stock por talla en el modal
+    const handleViewStock = (product) => {
+        setSelectedProductStock(product.stockPorTalla || {});
+        setShowStockModal(true); // Mostrar el modal
+    };
+
+    // Cerrar el modal de stock
+    const closeStockModal = () => {
+        setShowStockModal(false);
+        setSelectedProductStock({});
+    };
+    
     useEffect(() => {
         const role = localStorage.getItem('userRole');
         const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -40,6 +54,7 @@ const ProductManager = () => {
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error al obtener productos:', error);
+                alert('No se pudieron cargar los productos. Intenta nuevamente más tarde.');
             }
         };
 
@@ -51,25 +66,59 @@ const ProductManager = () => {
         const { name, value } = e.target;
         setProductData({ ...productData, [name]: value });
     };
+    
+    // Manejar la selección de tallas en el formulario
+    const handleTallaStockChange = (talla, isChecked) => {
+        setProductData((prevData) => ({
+            ...prevData,
+            stockPorTalla: {
+                ...prevData.stockPorTalla,
+                [talla]: isChecked ? prevData.stockPorTalla[talla] || 0 : 0
+            }
+        }));
+    };
+
+    // Manejar el cambio en el stock de cada talla seleccionada
+    const handleStockChange = (talla, value) => {
+        setProductData((prevData) => ({
+            ...prevData,
+            stockPorTalla: {
+                ...prevData.stockPorTalla,
+                [talla]: Number(value)
+            }
+        }));
+    };
 
     // Manejar el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const hasValidStock = Object.values(productData.stockPorTalla).some(stock => stock > 0);
+    
+        if (productData.precio <= 0) {
+            alert('El precio debe ser mayor a 0.');
+            return;
+        }
+    
+        if (!hasValidStock) {
+            alert('Debe asignar stock a al menos una talla.');
+            return;
+        }
+    
         try {
             if (isEditing) {
-                // Actualizar producto
                 await productApi.put(`/products/${currentProductId}`, productData);
-                setProducts(products.map(product => (product._id === currentProductId ? productData : product)));
+                setProducts(products.map(product => (product._id === currentProductId ? { ...product, ...productData } : product)));
             } else {
-                // Crear producto
                 const response = await productApi.post('/products', productData);
                 setProducts([...products, response.data]);
             }
             resetForm();
         } catch (error) {
             console.error('Error al guardar producto:', error);
+            alert('Hubo un problema al guardar el producto. Intenta nuevamente.');
         }
     };
+    
 
     // Manejar la edición de un producto
     const handleEdit = (product) => {
@@ -90,10 +139,18 @@ const ProductManager = () => {
 
     // Reiniciar el formulario
     const resetForm = () => {
-        setProductData({ nombre: '', descripcion: '', precio: '', categoria: '', stock: '', imagen: '' });
+        setProductData({
+            nombre: '',
+            descripcion: '',
+            precio: '',
+            categoria: '',
+            stockPorTalla: Object.fromEntries(Array.from({ length: 16 }, (_, i) => [30 + i, 0])),
+            imagen: ''
+        });
         setIsEditing(false);
         setCurrentProductId(null);
     };
+    
 
     // Paginación: Obtener los productos actuales según la página
     const indexOfLastProduct = currentPage * productsPerPage;
@@ -167,17 +224,37 @@ const ProductManager = () => {
                                         <option value="Niño">Niño</option>
                                     </select>
                                 </div>
+                                {/* Stock por Talla */}
                                 <div className="mb-3">
-                                    <label className="form-label">Stock:</label>
-                                    <input
-                                        type="number"
-                                        name="stock"
-                                        value={productData.stock}
-                                        onChange={handleChange}
-                                        required
-                                        min="0"
-                                        className="form-control"
-                                    />
+                                    <label className="form-label">Stock por Talla:</label>
+                                    <div className="row">
+                                        {[...Array(16)].map((_, i) => {
+                                            const talla = 30 + i;
+                                            return (
+                                                <div key={talla} className="col-3 mb-2">
+                                                    <label>
+                                                        <input
+                                                            type="checkbox"
+                                                            name={`talla-${talla}`}
+                                                            checked={!!productData.stockPorTalla[talla]}
+                                                            onChange={(e) => handleTallaStockChange(talla, e.target.checked)}
+                                                        />
+                                                        {` Talla ${talla}`}
+                                                    </label>
+                                                    {productData.stockPorTalla[talla] !== undefined && (
+                                                        <input
+                                                            type="number"
+                                                            placeholder="Stock"
+                                                            min="0"
+                                                            className="form-control mt-1"
+                                                            value={productData.stockPorTalla[talla]}
+                                                            onChange={(e) => handleStockChange(talla, e.target.value)}
+                                                        />
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Imagen:</label>
@@ -227,7 +304,7 @@ const ProductManager = () => {
                                     <div>
                                         <strong>{product.nombre}</strong>
                                         <p className="mb-1 text-muted">{product.categoria}</p>
-                                        <p className="mb-1">Stock: {product.stock} | Precio: ${product.precio}</p>
+                                        <p className="mb-1">Precio: ${product.precio}</p>
                                     </div>
                                 </div>
                                 <div className="d-flex">
@@ -243,11 +320,33 @@ const ProductManager = () => {
                                     >
                                         Eliminar
                                     </button>
+                                    <button
+                                        onClick={() => handleViewStock(product)}
+                                        className="btn btn-secondary btn-sm"
+                                    >
+                                        Ver stock
+                                        </button>
                                 </div>
                             </div>
                         ))}
                     </div>
-
+                    {/* Modal para mostrar el stock por talla */}
+                    {showStockModal && (
+                                    <div className="modal-overlay">
+                                        <div className="modal-content">
+                                            <ul className="list-group mt-3">
+                                                {Object.entries(selectedProductStock).map(([talla, cantidad]) => (
+                                                    <li key={talla} className="list-group-item">
+                                                        <strong>Talla {talla}:</strong> {cantidad} existencias
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                            <button onClick={closeStockModal} className="btn btn-secondary mt-3">
+                                                Cerrar
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                     {/* Paginación */}
                     <div className="d-flex justify-content-center mt-3">
                         <nav>
