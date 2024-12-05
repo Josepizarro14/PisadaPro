@@ -11,7 +11,7 @@ const ProductManager = () => {
         descripcion: '',
         precio: '',
         categoria: '',
-        stockPorTalla: Object.fromEntries(Array.from({length: 16},(_,i) => [30 + i, 0])),
+        stockPorTalla: Object.fromEntries(Array.from({ length: 16 }, (_, i) => [30 + i, 0])),
         imagen: ''
     });
     const [isEditing, setIsEditing] = useState(false);
@@ -32,7 +32,7 @@ const ProductManager = () => {
         setShowStockModal(false);
         setSelectedProductStock({});
     };
-    
+
     useEffect(() => {
         const role = localStorage.getItem('userRole');
         const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -66,7 +66,7 @@ const ProductManager = () => {
         const { name, value } = e.target;
         setProductData({ ...productData, [name]: value });
     };
-    
+
     // Manejar la selección de tallas en el formulario
     const handleTallaStockChange = (talla, isChecked) => {
         setProductData((prevData) => ({
@@ -93,17 +93,17 @@ const ProductManager = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasValidStock = Object.values(productData.stockPorTalla).some(stock => stock > 0);
-    
+
         if (productData.precio <= 0) {
             alert('El precio debe ser mayor a 0.');
             return;
         }
-    
+
         if (!hasValidStock) {
             alert('Debe asignar stock a al menos una talla.');
             return;
         }
-    
+
         try {
             if (isEditing) {
                 await productApi.put(`/products/${currentProductId}`, productData);
@@ -118,7 +118,7 @@ const ProductManager = () => {
             alert('Hubo un problema al guardar el producto. Intenta nuevamente.');
         }
     };
-    
+
 
     // Manejar la edición de un producto
     const handleEdit = (product) => {
@@ -150,7 +150,7 @@ const ProductManager = () => {
         setIsEditing(false);
         setCurrentProductId(null);
     };
-    
+
 
     // Paginación: Obtener los productos actuales según la página
     const indexOfLastProduct = currentPage * productsPerPage;
@@ -325,28 +325,49 @@ const ProductManager = () => {
                                         className="btn btn-secondary btn-sm"
                                     >
                                         Ver stock
-                                        </button>
+                                    </button>
                                 </div>
                             </div>
                         ))}
                     </div>
                     {/* Modal para mostrar el stock por talla */}
                     {showStockModal && (
-                                    <div className="modal-overlay">
-                                        <div className="modal-content">
-                                            <ul className="list-group mt-3">
-                                                {Object.entries(selectedProductStock).map(([talla, cantidad]) => (
-                                                    <li key={talla} className="list-group-item">
-                                                        <strong>Talla {talla}:</strong> {cantidad} existencias
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                            <button onClick={closeStockModal} className="btn btn-secondary mt-3">
-                                                Cerrar
-                                            </button>
-                                        </div>
+                        <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+                            <div className="modal-dialog modal-dialog-centered">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Stock por Talla</h5>
+                                        <button
+                                            type="button"
+                                            className="btn-close"
+                                            onClick={closeStockModal}
+                                        ></button>
                                     </div>
-                                )}
+                                    <div className="modal-body">
+                                        <ul className="list-group">
+                                            {Object.entries(selectedProductStock).map(([talla, cantidad]) => (
+                                                <li key={talla} className="list-group-item d-flex justify-content-between align-items-center">
+                                                    <span><strong>Talla {talla}:</strong></span>
+                                                    <span>{cantidad} existencias</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            onClick={closeStockModal}
+                                        >
+                                            Cerrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+
                     {/* Paginación */}
                     <div className="d-flex justify-content-center mt-3">
                         <nav>
