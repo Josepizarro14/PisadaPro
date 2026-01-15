@@ -1,43 +1,81 @@
-# Proyecto E-commerce PisadaPro
+# PisadaPro
 
-Este es un proyecto de e-commerce desarrollado utilizando **Flask**, **PostgreSQL** y **Docker**. El objetivo de este proyecto es proporcionar una plataforma para la gestión de clientes y ventas de zapatillas. (Se busca implementar otros frameworks, también se incluirá MongoDB)
+Proyecto de **Aplicaciones de Internet** desarrollado como parte de la carrera **Ingeniería en Computación**.
 
-## Tecnologías utilizadas
+PisadaPro es una aplicación de comercio electrónico implementada usando una **arquitectura de microservicios**, con el objetivo de aplicar conceptos vistos en el ramo como desarrollo backend, consumo de APIs, bases de datos, contenedores y comunicación entre servicios.
 
-- **Flask**: Un microframework para Python que permite crear aplicaciones web de forma rápida y sencilla.
-- **PostgreSQL**: Un sistema de gestión de bases de datos relacional que se utiliza para almacenar los datos de la aplicación.
-- **Docker**: Una herramienta que permite crear, implementar y ejecutar aplicaciones en contenedores, asegurando que funcionen de manera consistente en cualquier entorno.
+## Arquitectura
 
-## Instalación y ejecución
+El proyecto está compuesto por varios servicios independientes, los cuales se ejecutan y se comunican entre sí mediante **Docker Compose**.
 
-Para ejecutar este proyecto, asegúrate de tener **Docker** instalado en tu máquina. Una vez que tengas Docker configurado, sigue estos pasos:
+### Frontend (`/frontend`)
+- **Tecnología:** React  
+- **Descripción:** Interfaz web de la aplicación. Permite visualizar productos, navegar por el catálogo y gestionar el carrito de compras.  
+- Se comunica con los servicios backend mediante APIs REST.
 
-Ejecuta el siguiente comando para construir y ejecutar los contenedores: docker-compose up --build
+### Servicio de Usuarios (`/user-service`)
+- **Tecnología:** Python (Flask)  
+- **Base de datos:** PostgreSQL  
+- **Descripción:** Maneja el registro, autenticación y la información básica de los usuarios.
 
-Una vez que los contenedores estén en funcionamiento, abre tu navegador y dirígete a: http://localhost:5000
+### Servicio de Productos (`/product-service`)
+- **Tecnología:** Node.js (Express)  
+- **Base de datos:** MongoDB  
+- **Descripción:** Gestiona la información de los productos disponibles en la tienda (crear, obtener y actualizar productos).
 
-En caso de cualquier problema, se puede modificar el docker-compose.yml
+### Servicio de Catálogo (`/catalog-service`)
+- **Tecnología:** Node.js (Express)  
+- **Base de datos:** MongoDB  
+- **Descripción:** Se encarga de la organización del catálogo, permitiendo búsquedas y filtrado de productos.
+
+### Servicio de Carrito (`/cart-service`)
+- **Tecnología:** Python (Flask)  
+- **Descripción:** Maneja el carrito de compras del usuario, permitiendo agregar y eliminar productos de forma temporal.
+
+## Requisitos
+
+Para ejecutar el proyecto de forma local es necesario tener instalado:
+
+- Docker  
+- Docker Compose  
+
+## Ejecución del proyecto
+
+Clonar el repositorio:
+
+```bash
+git clone https://github.com/josepizarro14/pisadapro.git
+cd pisadapro
+```
+
+Levantar los servicios:
+
+```bash
+docker-compose up --build
+```
+
+Una vez levantados los contenedores, la aplicación estará disponible en:
+```bash
+Frontend: http://localhost:3000 (o el puerto definido en docker-compose.yml)
+```
 
 ## Estructura del proyecto
-El proyecto sigue la estructura recomendada por Flask para facilitar la organización y escalabilidad del código. La estructura básica del proyecto es la siguiente:
+```bash
+pisadapro/
+├── cart-service/        # Microservicio de carrito (Flask)
+├── catalog-service/     # Microservicio de catálogo (Express)
+├── frontend/            # Frontend en React
+├── product-service/     # Microservicio de productos (Express)
+├── user-service/        # Microservicio de usuarios (Flask)
+├── docker-compose.yml   # Orquestación de servicios
+└── README.md
 
-### PisadaPro
+```
 
-* [app]
-  * [static]            # Archivos estáticos (CSS, JS, imágenes)
-  * [templates]         # Archivos HTML
-  * [app.py]            # Arranque de Flask
-  * [database.py]       # Conexión a la bd
-  * [models.py]         # Definición de los modelos de la base de datos
-  * [routes.py]         # Definición de las rutas de la aplicación
-  * [__init__.py]       # Inicialización de la aplicación Flask
-* [docker-compose.yml]  # Configuración de Docker
-* [Dockerfile]          # Utilización de Python para descargar las librerías
-* [requirements.txt]    # Librerías necesarias para el correcto funcionamiento
+## Notas
 
-## Inicio de sesión
+- Proyecto desarrollado con fines académicos.
 
-Para la creación de usuario hay 2 roles, cliente y administrador.
-Para poder entrar como administrador, las credenciales son las siguientes: correo: admin@example.com y contraseña: admin123
-Se crea este usuario por default.
+- No está pensado para un entorno productivo.
 
+- El foco principal fue la correcta separación de servicios y la comunicación entre ellos.
