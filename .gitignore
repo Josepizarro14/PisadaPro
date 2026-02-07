@@ -1,3 +1,5 @@
 
 cart-service/app/.env
 /catalog-service/app/node_modules
+/product-service/app/node_modules
+
