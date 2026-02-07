@@ -1,4 +1,5 @@
 const amqp = require('amqplib/callback_api');
+require('dotenv').config();
 const mongoose = require('mongoose');
 const Product = require('./models/Product.js'); // Asegúrate de tener tu modelo aquí
 
@@ -14,16 +15,16 @@ amqp.connect(RABBITMQ_URL, (error0, connection) => {
         if (error1) {
             throw error1;
         }
-        
+
         const queue = 'product_updates';
-        
+
         channel.assertQueue(queue, { durable: false });
         console.log(`Esperando mensajes en ${queue}`);
 
         channel.consume(queue, async (msg) => {
             const message = JSON.parse(msg.content.toString());
             console.log(`Mensaje recibido:`, message);
-            
+
             // Manejar el mensaje según la acción
             switch (message.action) {
                 case 'create':

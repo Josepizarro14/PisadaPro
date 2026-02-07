@@ -1,5 +1,6 @@
 // server.js
-const app = require('./App'); // Importa la configuración de tu aplicación desde App.js
+require('dotenv').config();
+const app = require('./app.js'); // Importa la configuración de tu aplicación desde App.js
 const port = process.env.PORT || 5002;
 
 app.listen(port, () => {

@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -10,7 +11,7 @@ const RABBITMQ_URL = process.env.RABBITMQ_URL; // URL de RabbitMQ
 
 // Configuración de CORS
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true,
 };
 app.use(cors(corsOptions));
@@ -23,8 +24,8 @@ mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => console.log('Conectado a MongoDB'))
-.catch(err => console.error('Error al conectar a MongoDB:', err));
+    .then(() => console.log('Conectado a MongoDB'))
+    .catch(err => console.error('Error al conectar a MongoDB:', err));
 
 // Conectar a RabbitMQ con reconexión
 let channel = null;
@@ -70,10 +71,11 @@ const productSchema = new mongoose.Schema({
     descripcion: { type: String, required: true },
     precio: { type: Number, required: true, min: 0 },
     categoria: { type: String, required: true },
-    stockPorTalla: { 
+    stockPorTalla: {
         type: Map,
         of: Number,
-        required: true, min: 0 },
+        required: true, min: 0
+    },
     imagen: { type: String },
     fechaCreacion: { type: Date, default: Date.now }
 });
@@ -98,10 +100,10 @@ app.post('/products', async (req, res) => {
     try {
         const product = new Product(req.body);
         await product.save();
-        
+
         // Enviar mensaje a RabbitMQ
         sendMessageToQueue('product_updates', { action: 'create', data: product });
-        
+
         res.status(201).send(product);
     } catch (error) {
         res.status(400).send({ error: 'Error al crear el producto: ' + error.message });
@@ -125,10 +127,10 @@ app.put('/products/:id', async (req, res) => {
         if (!product) {
             return res.status(404).send({ error: 'Producto no encontrado' });
         }
-        
+
         // Enviar mensaje de actualización a RabbitMQ
         sendMessageToQueue('product_updates', { action: 'update', data: product });
-        
+
         res.send(product);
     } catch (error) {
         res.status(400).send({ error: 'Error al actualizar el producto: ' + error.message });
@@ -142,10 +144,10 @@ app.delete('/products/:id', async (req, res) => {
         if (!product) {
             return res.status(404).send({ error: 'Producto no encontrado' });
         }
-        
+
         // Enviar mensaje de eliminación a RabbitMQ
         sendMessageToQueue('product_updates', { action: 'delete', data: { _id: product._id } });
-        
+
         res.send({ message: 'Producto eliminado', product });
     } catch (error) {
         res.status(500).send({ error: 'Error al eliminar el producto: ' + error.message });

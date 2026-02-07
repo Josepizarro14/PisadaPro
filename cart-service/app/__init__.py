@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from flask import Flask
 from app.database import db
 from app.routes import cart_bp
@@ -6,14 +8,15 @@ from transbank.webpay.webpay_plus.transaction import Transaction
 
 
 def create_app():
+    load_dotenv()
     app = Flask(__name__)
-    CORS(app, origins="http://localhost:3000", supports_credentials=True)
+    CORS(app, origins=os.getenv("CORS_ORIGIN", "http://localhost:3000"), supports_credentials=True)
     # Configuración de la base de datos
-    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://user:password@cart-db/pisadaprodb_cart"
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI", "postgresql://user:password@cart-db/pisadaprodb_cart")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    Transaction.commerce_code = '597055555532'  # Código de comercio para Webpay Plus en entorno de integración
-    Transaction.api_key = '579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C'  # Api Key Secret para pruebas
-    Transaction.environment = 'TEST'  # Cambia a 'PRODUCTION' en producción
+    Transaction.commerce_code = os.getenv("TRANSBANK_COMMERCE_CODE", '597055555532')
+    Transaction.api_key = os.getenv("TRANSBANK_API_KEY", '579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C')
+    Transaction.environment = os.getenv("TRANSBANK_ENVIRONMENT", 'TEST')
     
     # Inicialización de la base de datos
     db.init_app(app)

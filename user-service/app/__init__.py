@@ -1,4 +1,6 @@
 # app/__init__.py
+import os
+from dotenv import load_dotenv
 from flask import Flask, session
 from .database import db, init_db
 from .models import Cliente
@@ -7,14 +9,15 @@ from flask_cors import CORS
 from datetime import timedelta
 
 def create_app():
+    load_dotenv()
     app = Flask(__name__)
     # Configura CORS para que acepte las cookies
-    CORS(app, supports_credentials=True)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:password@user-db:5432/pisadaprodb_users'
+    CORS(app, origins=os.getenv("CORS_ORIGIN", "http://localhost:3000"), supports_credentials=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI", 'postgresql://user:password@user-db:5432/pisadaprodb_users')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SESSION_COOKIE_NAME'] = 'your_session_cookie_name'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)  # Ajusta el tiempo de vida de la sesión
-    app.secret_key = 'appweb'  # Cambia esto a una clave más segura
+    app.secret_key = os.getenv("SECRET_KEY", 'appweb')  # Cambia esto a una clave más segura
 
     # Inicializar base de datos
     init_db(app)

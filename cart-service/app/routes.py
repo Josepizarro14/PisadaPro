@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from flask import Blueprint, request, jsonify
 from app.models import db, Compra, DetalleCompra, Cliente 
@@ -5,13 +6,13 @@ from transbank.webpay.webpay_plus.transaction import Transaction
 import pymongo
 cart_bp = Blueprint('cart', __name__)
 
-MONGO_URL = "mongodb://product-db:27017/pisadapro_products"
+MONGO_URL = os.getenv("MONGO_URI_PRODUCTS", "mongodb://product-db:27017/pisadapro_products")
 mongo_client = pymongo.MongoClient(MONGO_URL)
 mongo_db = mongo_client.get_database()
 products_collection = mongo_db.get_collection("products")
 
 
-CATALOG_MONGO_URL = "mongodb://catalog-db:27017/pisadapro_catalogs"
+CATALOG_MONGO_URL = os.getenv("MONGO_URI_CATALOGS", "mongodb://catalog-db:27017/pisadapro_catalogs")
 catalog_client = pymongo.MongoClient(CATALOG_MONGO_URL)
 catalog_db = catalog_client.get_database()
 catalog_collection = catalog_db.get_collection("products")
@@ -225,7 +226,7 @@ def initiate_payment():
             buy_order=str(compra.id),
             session_id=cliente_email,
             amount=compra.total,
-            return_url='http://localhost:5003/cart/payment-return'  # URL de retorno
+            return_url= os.getenv("RETURN_URL_BASE", 'http://localhost:5003') + '/cart/payment-return'  # URL de retorno
         )
         print("Transacción iniciada con éxito, respuesta:", response)  # Log para ver la respuesta
         return jsonify({"url": response['url'], "token": response['token']})
@@ -313,15 +314,15 @@ def payment_return():
             db.session.commit()
 
             # Redirigir al frontend con éxito
-            return redirect(f'http://localhost:3000/order-success?order_id={compra.id}')
+            return redirect(f'{os.getenv("FRONTEND_URL", "http://localhost:3000")}/order-success?order_id={compra.id}')
 
         else:
             # Si no autorizado, redirigir con error
-            return redirect(f'http://localhost:3000/order-failure?error=pago_no_autorizado')
+            return redirect(f'{os.getenv("FRONTEND_URL", "http://localhost:3000")}/order-failure?error=pago_no_autorizado')
 
     except Exception as e:
         # Redirigir al frontend con error general
-        return redirect(f'http://localhost:3000/order-failure?error={str(e)}')
+        return redirect(f'{os.getenv("FRONTEND_URL", "http://localhost:3000")}/order-failure?error={str(e)}')
     
     
 @cart_bp.route('/get-order-details/<int:order_id>', methods=['GET'])

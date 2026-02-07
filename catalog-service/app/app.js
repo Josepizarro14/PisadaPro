@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -11,7 +12,7 @@ const RABBITMQ_URL = process.env.RABBITMQ_URL; // URL de RabbitMQ
 
 // Configuración de CORS
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true,
 };
 app.use(cors(corsOptions));
@@ -24,8 +25,8 @@ mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => console.log('Conectado a MongoDB'))
-.catch(err => console.error('Error al conectar a MongoDB:', err));
+    .then(() => console.log('Conectado a MongoDB'))
+    .catch(err => console.error('Error al conectar a MongoDB:', err));
 
 // Conectar a RabbitMQ y configurar el consumidor
 let channel = null;
@@ -47,14 +48,14 @@ function connectRabbitMQ() {
             console.log('Conectado a RabbitMQ');
 
             const queue = 'product_updates';
-            
+
             channel.assertQueue(queue, { durable: false });
             console.log(`Esperando mensajes en ${queue}`);
 
             channel.consume(queue, async (msg) => {
                 const message = JSON.parse(msg.content.toString());
                 console.log(`Mensaje recibido:`, message);
-                
+
                 // Manejar el mensaje según la acción
                 try {
                     switch (message.action) {

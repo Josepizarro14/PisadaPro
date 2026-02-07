@@ -5,10 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import '../styles/styles.css';
 import '../styles/stylesProduct.css';
 
-const catalogApi = axios.create({
-    baseURL: 'http://localhost:5002', // URL del microservicio de catálogo
-    withCredentials: true,
-});
+import { catalogApi } from '../services/api';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
