@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from app.models import db, Compra, DetalleCompra, Cliente  # Asegúrate de importar el modelo Cliente
+from app.models import db, Compra, DetalleCompra, Cliente 
 from transbank.webpay.webpay_plus.transaction import Transaction
 import pymongo
 cart_bp = Blueprint('cart', __name__)
